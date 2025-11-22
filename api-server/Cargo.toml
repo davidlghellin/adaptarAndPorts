@@ -1,0 +1,17 @@
+[package]
+name = "api-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Runtime async
+tokio = { version = "1", features = ["full"] }
+
+# Web framework
+axum = "0.7"
+
+# Todas nuestras capas
+api-rest = { path = "../crates/api-rest" }
+reservas-application = { path = "../crates/application" }
+reservas-adapters = { path = "../crates/adapters" }
+reservas-ports = { path = "../crates/ports" }

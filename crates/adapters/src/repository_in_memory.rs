@@ -14,6 +14,12 @@ pub struct InMemoryReservaRepository {
     storage: Arc<RwLock<HashMap<String, Reserva>>>,
 }
 
+impl Default for InMemoryReservaRepository {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InMemoryReservaRepository {
     pub fn new() -> Self {
         Self {

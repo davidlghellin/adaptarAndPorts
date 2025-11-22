@@ -1,5 +1,5 @@
 use crate::slot::Slot;
-use chrono::{Datelike, Utc};
+use chrono::Utc;
 
 /// Entidad de dominio: Reserva
 /// Ahora representa una reserva de un EMPLEADO para un SLOT de tiempo específico
@@ -80,6 +80,7 @@ impl Reserva {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::Datelike;
 
     #[test]
     fn test_crear_reserva_valida() {

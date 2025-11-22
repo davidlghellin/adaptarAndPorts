@@ -1,0 +1,27 @@
+[package]
+name = "api-rest"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Web framework
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+
+# Serialización
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Chrono para fechas (con serde)
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# OpenAPI/Swagger
+utoipa = { version = "5.3", features = ["axum_extras", "chrono"] }
+utoipa-swagger-ui = { version = "8.0", features = ["axum"] }
+
+# Nuestras capas internas
+reservas-domain = { path = "../domain" }
+reservas-ports = { path = "../ports" }

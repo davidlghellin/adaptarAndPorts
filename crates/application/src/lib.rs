@@ -147,4 +147,18 @@ impl<R: EmpleadoRepository + Send + Sync> EmpleadoService for EmpleadoServiceImp
 
         Ok(empleado)
     }
+
+    async fn activar_empleado(&self, id: &str) -> Result<Empleado, String> {
+        let mut empleado = self
+            .repository
+            .obtener(id)
+            .await?
+            .ok_or_else(|| "Empleado no encontrado".to_string())?;
+
+        empleado.activar();
+
+        self.repository.actualizar(&empleado).await?;
+
+        Ok(empleado)
+    }
 }
