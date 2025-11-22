@@ -1,0 +1,10 @@
+[package]
+name = "reservas-ports"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Los puertos solo dependen del dominio y async-trait
+reservas-domain = { path = "../domain" }
+async-trait = { workspace = true }
+chrono = { workspace = true }

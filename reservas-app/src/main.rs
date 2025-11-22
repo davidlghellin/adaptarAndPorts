@@ -1,19 +1,24 @@
-// Punto de entrada de la aplicación
-// Aquí "armamos" todo conectando los adaptadores con los puertos
+// 🚀 BINARIO PRINCIPAL
+//
+// Aquí es donde "armamos" toda la aplicación:
+// 1. Elegimos qué adaptadores usar
+// 2. Creamos las instancias
+// 3. Conectamos todo mediante inyección de dependencias
 
-mod adapters;
-mod application;
-mod domain;
-mod ports;
-
-use adapters::repository_in_memory::InMemoryReservaRepository;
-use application::ReservaServiceImpl;
+use reservas_adapters::InMemoryReservaRepository;
+use reservas_application::ReservaServiceImpl;
+use reservas_ports::ReservaService;
 use chrono::Utc;
-use ports::ReservaService;
 
 #[tokio::main]
 async fn main() {
-    println!("🎯 Sistema de Reservas - Arquitectura Hexagonal\n");
+    println!("🎯 Sistema de Reservas - Arquitectura Hexagonal (Multi-crate)\n");
+    println!("📦 Estructura:");
+    println!("   - reservas-domain: Lógica de negocio pura");
+    println!("   - reservas-ports: Interfaces (contratos)");
+    println!("   - reservas-application: Casos de uso");
+    println!("   - reservas-adapters: Implementaciones concretas");
+    println!();
 
     // 1. Creamos el adaptador (repositorio en memoria)
     let repository = InMemoryReservaRepository::new();
@@ -60,9 +65,10 @@ async fn main() {
         Err(e) => println!("❌ Error al crear reserva: {}", e),
     }
 
-    println!("\n🎓 Ventajas de la arquitectura hexagonal:");
-    println!("   1. El dominio (Reserva) no conoce nada de infraestructura");
-    println!("   2. Podemos cambiar el adaptador (InMemory → Postgres) sin tocar el dominio");
-    println!("   3. Los puertos definen contratos claros");
-    println!("   4. Fácil de testear cada capa independientemente");
+    println!("\n🎓 Ventajas de separar en crates:");
+    println!("   1. ✅ El compilador FUERZA las dependencias correctas");
+    println!("   2. ✅ Imposible que dominio dependa de infraestructura");
+    println!("   3. ✅ Cada crate se puede versionar independientemente");
+    println!("   4. ✅ Reutilización: otros proyectos pueden usar solo el dominio");
+    println!("   5. ✅ Compilación en paralelo más eficiente");
 }

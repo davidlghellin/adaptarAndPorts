@@ -1,8 +1,16 @@
-// Módulo de aplicación - Implementa los CASOS DE USO
-// Orquesta el dominio usando los puertos
+// ⚙️ APLICACIÓN - Implementa los CASOS DE USO
+//
+// Esta capa orquesta el dominio usando los puertos
+// Es donde vive la lógica de aplicación (no confundir con lógica de negocio)
+//
+// Responsabilidades:
+// - Coordinar operaciones
+// - Validar permisos
+// - Gestionar transacciones
+// - Llamar al dominio
 
-use crate::domain::Reserva;
-use crate::ports::{ReservaRepository, ReservaService};
+use reservas_domain::Reserva;
+use reservas_ports::{ReservaRepository, ReservaService};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;

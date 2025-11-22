@@ -1,7 +1,13 @@
-// Módulo de puertos - Interfaces que definen CONTRATOS
+// 🔌 PUERTOS - Interfaces que definen CONTRATOS
+//
 // Los puertos son como "enchufes" donde conectaremos los adaptadores
+// Definen QUÉ se puede hacer, pero no CÓMO se hace
+//
+// Dos tipos:
+// - INPUT PORTS: Cómo usar el sistema (casos de uso)
+// - OUTPUT PORTS: Qué necesita el sistema (repositorios, etc.)
 
-use crate::domain::Reserva;
+use reservas_domain::Reserva;
 use async_trait::async_trait;
 
 /// Puerto de entrada (INPUT PORT): Define cómo usar el sistema
