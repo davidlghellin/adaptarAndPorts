@@ -11,6 +11,12 @@ pub struct InMemoryEmpleadoRepository {
     storage: Arc<RwLock<HashMap<String, Empleado>>>,
 }
 
+impl Default for InMemoryEmpleadoRepository {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InMemoryEmpleadoRepository {
     pub fn new() -> Self {
         Self {

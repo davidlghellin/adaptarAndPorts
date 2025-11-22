@@ -1,5 +1,5 @@
 use crate::{Empleado, Reserva, Slot};
-use chrono::{Datelike, Timelike};
+use chrono::Timelike;
 use std::collections::HashMap;
 
 /// Servicio de Dominio: Gestiona la disponibilidad de empleados
@@ -210,7 +210,7 @@ impl TablaDisponibilidad {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Utc;
+    use chrono::{Datelike, Utc};
 
     fn crear_empleado(id: &str, nombre: &str) -> Empleado {
         Empleado::new(
