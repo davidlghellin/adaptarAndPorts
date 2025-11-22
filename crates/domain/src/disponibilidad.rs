@@ -221,8 +221,8 @@ mod tests {
     }
 
     fn crear_slot_futuro(hour: u32) -> Slot {
-        let mañana = Utc::now() + chrono::Duration::days(1);
-        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), hour).unwrap()
+        let manyana = Utc::now() + chrono::Duration::days(1);
+        Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), hour).unwrap()
     }
 
     #[test]

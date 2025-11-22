@@ -41,7 +41,7 @@ impl Slot {
     /// Verifica si este slot es en horario laboral (9:00 - 18:00)
     pub fn es_horario_laboral(&self) -> bool {
         let hora = self.inicio.hour();
-        hora >= 9 && hora < 18
+        (9..18).contains(&hora)
     }
 
     /// Siguiente slot (1 hora después)

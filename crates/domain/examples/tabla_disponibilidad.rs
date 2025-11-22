@@ -33,9 +33,9 @@ fn main() {
     println!();
 
     // 2. Crear slots del día (de 9:00 a 12:00)
-    let mañana = Utc::now() + chrono::Duration::days(1);
+    let manyana = Utc::now() + chrono::Duration::days(1);
     let slots: Vec<Slot> = (9..=12)
-        .filter_map(|h| Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), h))
+        .filter_map(|h| Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), h))
         .collect();
 
     println!("⏰ Slots disponibles:");

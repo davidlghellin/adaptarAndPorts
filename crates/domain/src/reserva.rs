@@ -83,9 +83,9 @@ mod tests {
 
     #[test]
     fn test_crear_reserva_valida() {
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -117,11 +117,11 @@ mod tests {
 
     #[test]
     fn test_slot_fuera_horario_laboral() {
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
+            manyana.year(),
+            manyana.month(),
+            manyana.day(),
             20, // 8 PM - fuera de horario
         )
         .unwrap();
@@ -138,9 +138,9 @@ mod tests {
 
     #[test]
     fn test_descripcion_vacia() {
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -154,9 +154,9 @@ mod tests {
 
     #[test]
     fn test_confirmar_reserva() {
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 14).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 14).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),
@@ -173,9 +173,9 @@ mod tests {
 
     #[test]
     fn test_cancelar_reserva() {
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 14).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 14).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),

@@ -43,13 +43,13 @@ async fn main() {
     println!("   ✓ {} creado", emp1.nombre);
     println!("   ✓ {} creada\n", emp2.nombre);
 
-    // 4. Creamos slots para mañana
-    let mañana = Utc::now() + chrono::Duration::days(1);
+    // 4. Creamos slots para manyana
+    let manyana = Utc::now() + chrono::Duration::days(1);
     let slot_10 =
-        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+        Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
     let slot_11 =
-        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 11).unwrap();
+        Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 11).unwrap();
 
     // 5. Creamos reservas
     println!("📝 Creando reservas...");
@@ -109,7 +109,7 @@ async fn main() {
     let reservas = reserva_service.listar_reservas().await.unwrap();
 
     let slots_del_dia: Vec<Slot> = (9..=12)
-        .filter_map(|h| Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), h))
+        .filter_map(|h| Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), h))
         .collect();
 
     let tabla =

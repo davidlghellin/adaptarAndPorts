@@ -95,9 +95,9 @@ mod tests {
     #[tokio::test]
     async fn test_guardar_y_obtener() {
         let repo = InMemoryReservaRepository::new();
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -116,9 +116,9 @@ mod tests {
     #[tokio::test]
     async fn test_actualizar() {
         let repo = InMemoryReservaRepository::new();
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),
@@ -139,9 +139,9 @@ mod tests {
     #[tokio::test]
     async fn test_existe_para_empleado_en_slot() {
         let repo = InMemoryReservaRepository::new();
-        let mañana = Utc::now() + chrono::Duration::days(1);
+        let manyana = Utc::now() + chrono::Duration::days(1);
         let slot =
-            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
+            Slot::from_date_and_hour(manyana.year(), manyana.month(), manyana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
