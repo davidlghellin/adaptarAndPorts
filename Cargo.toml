@@ -1,9 +1,14 @@
-[package]
-name = "reservas_hexagonal"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [
+    "crates/domain",
+    "crates/ports",
+    "crates/application",
+    "crates/adapters",
+    "reservas-app",
+]
 
-[dependencies]
+[workspace.dependencies]
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
 chrono = "0.4"

@@ -1,0 +1,12 @@
+[package]
+name = "reservas-application"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# La aplicación depende de dominio y puertos
+reservas-domain = { path = "../domain" }
+reservas-ports = { path = "../ports" }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }

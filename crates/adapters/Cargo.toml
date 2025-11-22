@@ -1,0 +1,14 @@
+[package]
+name = "reservas-adapters"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Los adaptadores dependen de dominio y puertos
+reservas-domain = { path = "../domain" }
+reservas-ports = { path = "../ports" }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+chrono = { workspace = true }

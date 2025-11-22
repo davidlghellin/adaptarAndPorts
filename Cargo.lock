@@ -243,13 +243,53 @@ dependencies = [
 ]
 
 [[package]]
-name = "reservas_hexagonal"
+name = "reservas-adapters"
 version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "reservas-domain",
+ "reservas-ports",
  "tokio",
+]
+
+[[package]]
+name = "reservas-app"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reservas-adapters",
+ "reservas-application",
+ "reservas-domain",
+ "reservas-ports",
+ "tokio",
+]
+
+[[package]]
+name = "reservas-application"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "reservas-domain",
+ "reservas-ports",
  "uuid",
+]
+
+[[package]]
+name = "reservas-domain"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+]
+
+[[package]]
+name = "reservas-ports"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "reservas-domain",
 ]
 
 [[package]]

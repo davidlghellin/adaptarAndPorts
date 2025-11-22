@@ -1,8 +1,8 @@
 // Adaptador de salida: Repositorio en memoria
 // Implementa el puerto ReservaRepository usando un HashMap
 
-use crate::domain::Reserva;
-use crate::ports::ReservaRepository;
+use reservas_domain::Reserva;
+use reservas_ports::ReservaRepository;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -60,7 +60,7 @@ impl ReservaRepository for InMemoryReservaRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::EstadoReserva;
+    use reservas_domain::EstadoReserva;
     use chrono::Utc;
 
     #[tokio::test]

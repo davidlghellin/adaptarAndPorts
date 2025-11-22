@@ -1,0 +1,9 @@
+[package]
+name = "reservas-domain"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# El dominio SOLO depende de chrono para DateTime
+# NO tiene dependencias de infraestructura
+chrono = { workspace = true }
