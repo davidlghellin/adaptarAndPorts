@@ -5,7 +5,11 @@ members = [
     "crates/ports",
     "crates/application",
     "crates/adapters",
-    "reservas-app", "crates/api-rest", "api-server",
+    "crates/api-rest",
+    "crates/cli",
+    "reservas-app",
+    "api-server",
+    "cli-app",
 ]
 
 [workspace.dependencies]
