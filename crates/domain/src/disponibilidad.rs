@@ -1,6 +1,6 @@
 use crate::{Empleado, Reserva, Slot};
-use std::collections::HashMap;
 use chrono::{Datelike, Timelike};
+use std::collections::HashMap;
 
 /// Servicio de Dominio: Gestiona la disponibilidad de empleados
 ///
@@ -38,11 +38,9 @@ impl DisponibilidadService {
         slot: &Slot,
         reservas: &[Reserva],
     ) -> bool {
-        !reservas.iter().any(|r| {
-            r.empleado_id == empleado_id
-                && r.slot == *slot
-                && r.esta_activa()
-        })
+        !reservas
+            .iter()
+            .any(|r| r.empleado_id == empleado_id && r.slot == *slot && r.esta_activa())
     }
 
     /// Obtiene todas las reservas de un empleado en un rango de slots
@@ -66,11 +64,9 @@ impl DisponibilidadService {
 
         for empleado in empleados.iter().filter(|e| e.activo) {
             for slot in slots {
-                let reserva = reservas.iter().find(|r| {
-                    r.empleado_id == empleado.id
-                        && r.slot == *slot
-                        && r.esta_activa()
-                });
+                let reserva = reservas
+                    .iter()
+                    .find(|r| r.empleado_id == empleado.id && r.slot == *slot && r.esta_activa());
 
                 disponibilidad.push(DisponibilidadSlot {
                     empleado_id: empleado.id.clone(),
@@ -114,19 +110,16 @@ impl DisponibilidadService {
         slots
             .iter()
             .filter(|slot| {
-                empleados_activos.iter().all(|emp| {
-                    Self::empleado_disponible_en_slot(&emp.id, slot, reservas)
-                })
+                empleados_activos
+                    .iter()
+                    .all(|emp| Self::empleado_disponible_en_slot(&emp.id, slot, reservas))
             })
             .cloned()
             .collect()
     }
 
     /// Resumen de ocupación: cuántos empleados tienen reserva en cada slot
-    pub fn resumen_ocupacion(
-        slots: &[Slot],
-        reservas: &[Reserva],
-    ) -> HashMap<Slot, usize> {
+    pub fn resumen_ocupacion(slots: &[Slot], reservas: &[Reserva]) -> HashMap<Slot, usize> {
         let mut ocupacion = HashMap::new();
 
         for slot in slots {
@@ -183,9 +176,10 @@ impl TablaDisponibilidad {
             resultado.push_str(&format!("{:<20}", empleado.nombre));
 
             for slot in &self.slots {
-                let disp = self.disponibilidad.iter().find(|d| {
-                    d.empleado_id == empleado.id && d.slot == *slot
-                });
+                let disp = self
+                    .disponibilidad
+                    .iter()
+                    .find(|d| d.empleado_id == empleado.id && d.slot == *slot);
 
                 let simbolo = match disp {
                     Some(d) if d.disponible => " ✓ ",
@@ -202,10 +196,14 @@ impl TablaDisponibilidad {
     }
 
     /// Obtiene disponibilidad de un empleado en un slot específico
-    pub fn get_disponibilidad(&self, empleado_id: &str, slot: &Slot) -> Option<&DisponibilidadSlot> {
-        self.disponibilidad.iter().find(|d| {
-            d.empleado_id == empleado_id && d.slot == *slot
-        })
+    pub fn get_disponibilidad(
+        &self,
+        empleado_id: &str,
+        slot: &Slot,
+    ) -> Option<&DisponibilidadSlot> {
+        self.disponibilidad
+            .iter()
+            .find(|d| d.empleado_id == empleado_id && d.slot == *slot)
     }
 }
 
@@ -215,17 +213,16 @@ mod tests {
     use chrono::Utc;
 
     fn crear_empleado(id: &str, nombre: &str) -> Empleado {
-        Empleado::new(id.to_string(), nombre.to_string(), format!("{}@empresa.com", id))
+        Empleado::new(
+            id.to_string(),
+            nombre.to_string(),
+            format!("{}@empresa.com", id),
+        )
     }
 
     fn crear_slot_futuro(hour: u32) -> Slot {
         let mañana = Utc::now() + chrono::Duration::days(1);
-        Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            hour,
-        ).unwrap()
+        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), hour).unwrap()
     }
 
     #[test]
@@ -234,9 +231,7 @@ mod tests {
         let reservas = vec![];
 
         assert!(DisponibilidadService::empleado_disponible_en_slot(
-            "emp-001",
-            &slot,
-            &reservas
+            "emp-001", &slot, &reservas
         ));
     }
 
@@ -248,7 +243,8 @@ mod tests {
             "emp-001".to_string(),
             slot.clone(),
             "Reunión".to_string(),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert!(!DisponibilidadService::empleado_disponible_en_slot(
             "emp-001",
@@ -264,23 +260,18 @@ mod tests {
             crear_empleado("emp-002", "María"),
         ];
 
-        let slots = vec![
-            crear_slot_futuro(10),
-            crear_slot_futuro(11),
-        ];
+        let slots = vec![crear_slot_futuro(10), crear_slot_futuro(11)];
 
         let reserva = Reserva::new(
             "r1".to_string(),
             "emp-001".to_string(),
             slots[0].clone(),
             "Reunión".to_string(),
-        ).unwrap();
+        )
+        .unwrap();
 
-        let tabla = DisponibilidadService::generar_tabla_disponibilidad(
-            &empleados,
-            &slots,
-            &[reserva],
-        );
+        let tabla =
+            DisponibilidadService::generar_tabla_disponibilidad(&empleados, &slots, &[reserva]);
 
         assert_eq!(tabla.empleados.len(), 2);
         assert_eq!(tabla.slots.len(), 2);
@@ -302,10 +293,7 @@ mod tests {
             crear_empleado("emp-002", "María"),
         ];
 
-        let slots = vec![
-            crear_slot_futuro(10),
-            crear_slot_futuro(11),
-        ];
+        let slots = vec![crear_slot_futuro(10), crear_slot_futuro(11)];
 
         // Solo emp-001 tiene reserva a las 10:00
         let reserva = Reserva::new(
@@ -313,13 +301,11 @@ mod tests {
             "emp-001".to_string(),
             slots[0].clone(),
             "Reunión".to_string(),
-        ).unwrap();
+        )
+        .unwrap();
 
-        let libres = DisponibilidadService::slots_con_todos_disponibles(
-            &empleados,
-            &slots,
-            &[reserva],
-        );
+        let libres =
+            DisponibilidadService::slots_con_todos_disponibles(&empleados, &slots, &[reserva]);
 
         // Solo el slot de las 11:00 debe estar libre para ambos
         assert_eq!(libres.len(), 1);

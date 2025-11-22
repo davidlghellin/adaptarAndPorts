@@ -10,12 +10,12 @@
 // PRINCIPIO: El dominio NO conoce nada de infraestructura
 // No depende de bases de datos, APIs, frameworks, etc.
 
+pub mod disponibilidad;
 pub mod empleado;
 pub mod reserva;
 pub mod slot;
-pub mod disponibilidad;
 
-pub use empleado::Empleado;
-pub use reserva::{Reserva, EstadoReserva, ReservaError};
-pub use slot::Slot;
 pub use disponibilidad::DisponibilidadService;
+pub use empleado::Empleado;
+pub use reserva::{EstadoReserva, Reserva, ReservaError};
+pub use slot::Slot;

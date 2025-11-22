@@ -7,8 +7,8 @@
 // - INPUT PORTS: Cómo usar el sistema (casos de uso)
 // - OUTPUT PORTS: Qué necesita el sistema (repositorios, etc.)
 
-use reservas_domain::{Empleado, Reserva, Slot};
 use async_trait::async_trait;
+use reservas_domain::{Empleado, Reserva, Slot};
 
 /// Puerto de entrada (INPUT PORT): Define cómo usar el sistema
 /// Este es el "caso de uso" de nuestro sistema
@@ -67,7 +67,11 @@ pub trait ReservaRepository {
 
     async fn existe(&self, id: &str) -> Result<bool, String>;
 
-    async fn existe_para_empleado_en_slot(&self, empleado_id: &str, slot: &Slot) -> Result<bool, String>;
+    async fn existe_para_empleado_en_slot(
+        &self,
+        empleado_id: &str,
+        slot: &Slot,
+    ) -> Result<bool, String>;
 }
 
 /// Puerto de salida (OUTPUT PORT): Define cómo persistir empleados

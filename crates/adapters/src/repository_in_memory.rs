@@ -1,9 +1,9 @@
 // Adaptador de salida: Repositorio en memoria
 // Implementa el puerto ReservaRepository usando un HashMap
 
+use async_trait::async_trait;
 use reservas_domain::{Reserva, Slot};
 use reservas_ports::ReservaRepository;
-use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -74,37 +74,38 @@ impl ReservaRepository for InMemoryReservaRepository {
         Ok(storage.contains_key(id))
     }
 
-    async fn existe_para_empleado_en_slot(&self, empleado_id: &str, slot: &Slot) -> Result<bool, String> {
+    async fn existe_para_empleado_en_slot(
+        &self,
+        empleado_id: &str,
+        slot: &Slot,
+    ) -> Result<bool, String> {
         let storage = self.storage.read().await;
-        Ok(storage.values().any(|r| {
-            r.empleado_id == empleado_id && r.slot == *slot && r.esta_activa()
-        }))
+        Ok(storage
+            .values()
+            .any(|r| r.empleado_id == empleado_id && r.slot == *slot && r.esta_activa()))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::{Datelike, Utc};
     use reservas_domain::{EstadoReserva, Slot};
-    use chrono::{Utc, Datelike};
 
     #[tokio::test]
     async fn test_guardar_y_obtener() {
         let repo = InMemoryReservaRepository::new();
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            10
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
             "emp-001".to_string(),
             slot,
-            "Test".to_string()
-        ).unwrap();
+            "Test".to_string(),
+        )
+        .unwrap();
 
         repo.guardar(&reserva).await.unwrap();
         let obtenida = repo.obtener("1").await.unwrap();
@@ -116,19 +117,16 @@ mod tests {
     async fn test_actualizar() {
         let repo = InMemoryReservaRepository::new();
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            10
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),
             "emp-001".to_string(),
             slot,
-            "Test".to_string()
-        ).unwrap();
+            "Test".to_string(),
+        )
+        .unwrap();
         repo.guardar(&reserva).await.unwrap();
 
         reserva.confirmar();
@@ -142,23 +140,26 @@ mod tests {
     async fn test_existe_para_empleado_en_slot() {
         let repo = InMemoryReservaRepository::new();
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            10
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
             "emp-001".to_string(),
             slot.clone(),
-            "Test".to_string()
-        ).unwrap();
+            "Test".to_string(),
+        )
+        .unwrap();
 
         repo.guardar(&reserva).await.unwrap();
 
-        assert!(repo.existe_para_empleado_en_slot("emp-001", &slot).await.unwrap());
-        assert!(!repo.existe_para_empleado_en_slot("emp-002", &slot).await.unwrap());
+        assert!(repo
+            .existe_para_empleado_en_slot("emp-001", &slot)
+            .await
+            .unwrap());
+        assert!(!repo
+            .existe_para_empleado_en_slot("emp-002", &slot)
+            .await
+            .unwrap());
     }
 }

@@ -1,17 +1,29 @@
 // Ejemplo de uso del servicio de disponibilidad
 // Ejecutar con: cargo run --example tabla_disponibilidad -p reservas-domain
 
-use reservas_domain::{Empleado, Reserva, Slot, DisponibilidadService};
-use chrono::{Utc, Datelike, Timelike};
+use chrono::{Datelike, Timelike, Utc};
+use reservas_domain::{DisponibilidadService, Empleado, Reserva, Slot};
 
 fn main() {
     println!("📊 Demo: Tabla de Disponibilidad de Empleados\n");
 
     // 1. Crear empleados
     let empleados = vec![
-        Empleado::new("emp-001".to_string(), "Juan López".to_string(), "juan@empresa.com".to_string()),
-        Empleado::new("emp-002".to_string(), "María García".to_string(), "maria@empresa.com".to_string()),
-        Empleado::new("emp-003".to_string(), "Pedro Martínez".to_string(), "pedro@empresa.com".to_string()),
+        Empleado::new(
+            "emp-001".to_string(),
+            "Juan López".to_string(),
+            "juan@empresa.com".to_string(),
+        ),
+        Empleado::new(
+            "emp-002".to_string(),
+            "María García".to_string(),
+            "maria@empresa.com".to_string(),
+        ),
+        Empleado::new(
+            "emp-003".to_string(),
+            "Pedro Martínez".to_string(),
+            "pedro@empresa.com".to_string(),
+        ),
     ];
 
     println!("👥 Empleados:");
@@ -23,14 +35,7 @@ fn main() {
     // 2. Crear slots del día (de 9:00 a 12:00)
     let mañana = Utc::now() + chrono::Duration::days(1);
     let slots: Vec<Slot> = (9..=12)
-        .filter_map(|h| {
-            Slot::from_date_and_hour(
-                mañana.year(),
-                mañana.month(),
-                mañana.day(),
-                h,
-            )
-        })
+        .filter_map(|h| Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), h))
         .collect();
 
     println!("⏰ Slots disponibles:");
@@ -75,16 +80,17 @@ fn main() {
     println!("📅 Reservas creadas:");
     for r in &reservas {
         let emp = empleados.iter().find(|e| e.id == r.empleado_id).unwrap();
-        println!("   - {} a las {}:00 - {}", emp.nombre, r.slot.inicio.hour(), r.descripcion);
+        println!(
+            "   - {} a las {}:00 - {}",
+            emp.nombre,
+            r.slot.inicio.hour(),
+            r.descripcion
+        );
     }
     println!();
 
     // 4. Generar tabla de disponibilidad
-    let tabla = DisponibilidadService::generar_tabla_disponibilidad(
-        &empleados,
-        &slots,
-        &reservas,
-    );
+    let tabla = DisponibilidadService::generar_tabla_disponibilidad(&empleados, &slots, &reservas);
 
     println!("📊 Tabla de Disponibilidad:");
     println!("{}", tabla.formato_texto());
@@ -93,11 +99,8 @@ fn main() {
     println!();
 
     // 5. Encontrar slots donde todos están disponibles
-    let libres_todos = DisponibilidadService::slots_con_todos_disponibles(
-        &empleados,
-        &slots,
-        &reservas,
-    );
+    let libres_todos =
+        DisponibilidadService::slots_con_todos_disponibles(&empleados, &slots, &reservas);
 
     println!("🎯 Slots donde TODOS están disponibles:");
     if libres_todos.is_empty() {
@@ -111,11 +114,7 @@ fn main() {
 
     // 6. Ver slots libres de un empleado específico
     let emp_id = "emp-001";
-    let libres_juan = DisponibilidadService::slots_libres_empleado(
-        emp_id,
-        &slots,
-        &reservas,
-    );
+    let libres_juan = DisponibilidadService::slots_libres_empleado(emp_id, &slots, &reservas);
 
     println!("📌 Slots libres para Juan López:");
     for slot in &libres_juan {
@@ -129,7 +128,11 @@ fn main() {
     println!("📈 Resumen de ocupación:");
     for slot in &slots {
         let count = ocupacion.get(slot).unwrap_or(&0);
-        println!("   {} - {} empleado(s) ocupado(s)", slot.formato_legible(), count);
+        println!(
+            "   {} - {} empleado(s) ocupado(s)",
+            slot.formato_legible(),
+            count
+        );
     }
     println!();
 

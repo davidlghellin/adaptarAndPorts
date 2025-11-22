@@ -5,11 +5,11 @@
 // 2. Creamos las instancias
 // 3. Conectamos todo mediante inyección de dependencias
 
+use chrono::{Datelike, Timelike, Utc};
 use reservas_adapters::{InMemoryEmpleadoRepository, InMemoryReservaRepository};
 use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl};
 use reservas_domain::{DisponibilidadService, Slot};
 use reservas_ports::{EmpleadoService, ReservaService};
-use chrono::{Datelike, Timelike, Utc};
 
 #[tokio::main]
 async fn main() {
@@ -45,19 +45,11 @@ async fn main() {
 
     // 4. Creamos slots para mañana
     let mañana = Utc::now() + chrono::Duration::days(1);
-    let slot_10 = Slot::from_date_and_hour(
-        mañana.year(),
-        mañana.month(),
-        mañana.day(),
-        10,
-    ).unwrap();
+    let slot_10 =
+        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
-    let slot_11 = Slot::from_date_and_hour(
-        mañana.year(),
-        mañana.month(),
-        mañana.day(),
-        11,
-    ).unwrap();
+    let slot_11 =
+        Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 11).unwrap();
 
     // 5. Creamos reservas
     println!("📝 Creando reservas...");
@@ -71,7 +63,11 @@ async fn main() {
         .await
     {
         Ok(r) => {
-            println!("   ✓ Reserva creada para {} a las {}:00", emp1.nombre, r.slot.inicio.hour());
+            println!(
+                "   ✓ Reserva creada para {} a las {}:00",
+                emp1.nombre,
+                r.slot.inicio.hour()
+            );
             println!("     Descripción: {}", r.descripcion);
         }
         Err(e) => println!("   ✗ Error: {}", e),
@@ -86,7 +82,11 @@ async fn main() {
         .await
     {
         Ok(r) => {
-            println!("   ✓ Reserva creada para {} a las {}:00", emp2.nombre, r.slot.inicio.hour());
+            println!(
+                "   ✓ Reserva creada para {} a las {}:00",
+                emp2.nombre,
+                r.slot.inicio.hour()
+            );
         }
         Err(e) => println!("   ✗ Error: {}", e),
     }
@@ -96,11 +96,7 @@ async fn main() {
     // 6. Intentar crear reserva duplicada (debe fallar)
     println!("🔒 Probando validación: reserva duplicada...");
     match reserva_service
-        .crear_reserva(
-            emp1.id.clone(),
-            slot_10.clone(),
-            "Otra reunión".to_string(),
-        )
+        .crear_reserva(emp1.id.clone(), slot_10.clone(), "Otra reunión".to_string())
         .await
     {
         Ok(_) => println!("   ✗ ERROR: No debería haber permitido esto!"),
@@ -113,30 +109,17 @@ async fn main() {
     let reservas = reserva_service.listar_reservas().await.unwrap();
 
     let slots_del_dia: Vec<Slot> = (9..=12)
-        .filter_map(|h| {
-            Slot::from_date_and_hour(
-                mañana.year(),
-                mañana.month(),
-                mañana.day(),
-                h,
-            )
-        })
+        .filter_map(|h| Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), h))
         .collect();
 
-    let tabla = DisponibilidadService::generar_tabla_disponibilidad(
-        &empleados,
-        &slots_del_dia,
-        &reservas,
-    );
+    let tabla =
+        DisponibilidadService::generar_tabla_disponibilidad(&empleados, &slots_del_dia, &reservas);
 
     println!("{}", tabla.formato_texto());
 
     // 8. Encontrar slots libres para reunión grupal
-    let slots_libres = DisponibilidadService::slots_con_todos_disponibles(
-        &empleados,
-        &slots_del_dia,
-        &reservas,
-    );
+    let slots_libres =
+        DisponibilidadService::slots_con_todos_disponibles(&empleados, &slots_del_dia, &reservas);
 
     println!("\n🎯 Slots donde TODOS están disponibles:");
     for slot in &slots_libres {

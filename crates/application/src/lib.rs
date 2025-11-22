@@ -9,9 +9,9 @@
 // - Gestionar transacciones
 // - Llamar al dominio
 
+use async_trait::async_trait;
 use reservas_domain::{Empleado, Reserva, Slot};
 use reservas_ports::{EmpleadoRepository, EmpleadoService, ReservaRepository, ReservaService};
-use async_trait::async_trait;
 use uuid::Uuid;
 
 /// Servicio de aplicación que implementa los casos de uso de reservas
@@ -37,7 +37,11 @@ impl<R: ReservaRepository + Send + Sync> ReservaService for ReservaServiceImpl<R
         let id = Uuid::new_v4().to_string();
 
         // Verificamos que el empleado no tenga ya una reserva en este slot
-        if self.repository.existe_para_empleado_en_slot(&empleado_id, &slot).await? {
+        if self
+            .repository
+            .existe_para_empleado_en_slot(&empleado_id, &slot)
+            .await?
+        {
             return Err(format!(
                 "El empleado {} ya tiene una reserva en el slot {}",
                 empleado_id,

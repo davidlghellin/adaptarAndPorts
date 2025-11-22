@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, Utc, Datelike, Timelike};
+use chrono::{DateTime, Datelike, Duration, Timelike, Utc};
 
 /// Value Object: Slot de tiempo
 /// Representa un bloque de tiempo de 1 hora
@@ -55,12 +55,9 @@ impl Slot {
     pub fn slots_del_dia(fecha: DateTime<Utc>) -> Vec<Self> {
         let mut slots = Vec::new();
         for hora in 9..18 {
-            if let Some(slot) = Self::from_date_and_hour(
-                fecha.year(),
-                fecha.month(),
-                fecha.day(),
-                hora,
-            ) {
+            if let Some(slot) =
+                Self::from_date_and_hour(fecha.year(), fecha.month(), fecha.day(), hora)
+            {
                 slots.push(slot);
             }
         }

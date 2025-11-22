@@ -1,5 +1,5 @@
-use chrono::{Datelike, Utc};
 use crate::slot::Slot;
+use chrono::{Datelike, Utc};
 
 /// Entidad de dominio: Reserva
 /// Ahora representa una reserva de un EMPLEADO para un SLOT de tiempo específico
@@ -84,12 +84,8 @@ mod tests {
     #[test]
     fn test_crear_reserva_valida() {
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            10,
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -107,12 +103,7 @@ mod tests {
     #[test]
     fn test_slot_en_el_pasado() {
         let ayer = Utc::now() - chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            ayer.year(),
-            ayer.month(),
-            ayer.day(),
-            10,
-        ).unwrap();
+        let slot = Slot::from_date_and_hour(ayer.year(), ayer.month(), ayer.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -132,7 +123,8 @@ mod tests {
             mañana.month(),
             mañana.day(),
             20, // 8 PM - fuera de horario
-        ).unwrap();
+        )
+        .unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -147,12 +139,8 @@ mod tests {
     #[test]
     fn test_descripcion_vacia() {
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            10,
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 10).unwrap();
 
         let reserva = Reserva::new(
             "1".to_string(),
@@ -167,19 +155,16 @@ mod tests {
     #[test]
     fn test_confirmar_reserva() {
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            14,
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 14).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),
             "emp-001".to_string(),
             slot,
             "Reunión importante".to_string(),
-        ).unwrap();
+        )
+        .unwrap();
 
         reserva.confirmar();
         assert_eq!(reserva.estado, EstadoReserva::Confirmada);
@@ -189,19 +174,16 @@ mod tests {
     #[test]
     fn test_cancelar_reserva() {
         let mañana = Utc::now() + chrono::Duration::days(1);
-        let slot = Slot::from_date_and_hour(
-            mañana.year(),
-            mañana.month(),
-            mañana.day(),
-            14,
-        ).unwrap();
+        let slot =
+            Slot::from_date_and_hour(mañana.year(), mañana.month(), mañana.day(), 14).unwrap();
 
         let mut reserva = Reserva::new(
             "1".to_string(),
             "emp-001".to_string(),
             slot,
             "Reunión".to_string(),
-        ).unwrap();
+        )
+        .unwrap();
 
         reserva.cancelar();
         assert_eq!(reserva.estado, EstadoReserva::Cancelada);
