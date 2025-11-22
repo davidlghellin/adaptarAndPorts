@@ -8,6 +8,8 @@
 //
 // Implementan los puertos (traits) usando tecnología real
 
+pub mod empleado_repository_in_memory;
 pub mod repository_in_memory;
 
+pub use empleado_repository_in_memory::InMemoryEmpleadoRepository;
 pub use repository_in_memory::InMemoryReservaRepository;
