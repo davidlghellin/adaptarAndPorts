@@ -1,0 +1,16 @@
+[package]
+name = "cli-app"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "reservas"
+path = "src/main.rs"
+
+[dependencies]
+# Usamos la librería del CLI
+reservas-cli = { path = "../crates/cli" }
+
+# Solo necesitamos clap y colored para el main
+clap = { version = "4.5", features = ["derive"] }
+colored = "2.0"
