@@ -1,13 +1,14 @@
-use chrono::{DateTime, Utc};
+use chrono::{Datelike, Utc};
+use crate::slot::Slot;
 
 /// Entidad de dominio: Reserva
-/// Esta es nuestra entidad central. NO depende de nada externo.
+/// Ahora representa una reserva de un EMPLEADO para un SLOT de tiempo específico
 #[derive(Debug, Clone, PartialEq)]
 pub struct Reserva {
     pub id: String,
-    pub nombre_cliente: String,
-    pub fecha: DateTime<Utc>,
-    pub num_personas: u8,
+    pub empleado_id: String,
+    pub slot: Slot,
+    pub descripcion: String,
     pub estado: EstadoReserva,
 }
 
@@ -22,34 +23,40 @@ pub enum EstadoReserva {
 /// Errores del dominio
 #[derive(Debug, PartialEq)]
 pub enum ReservaError {
-    NumeroPersonasInvalido,
-    FechaInvalida,
-    ReservaDuplicada,
+    SlotEnElPasado,
+    SlotFueraDeHorarioLaboral,
+    EmpleadoYaTieneReservaEnEsteSlot,
+    DescripcionVacia,
 }
 
 impl Reserva {
     /// Constructor con validaciones de negocio
     pub fn new(
         id: String,
-        nombre_cliente: String,
-        fecha: DateTime<Utc>,
-        num_personas: u8,
+        empleado_id: String,
+        slot: Slot,
+        descripcion: String,
     ) -> Result<Self, ReservaError> {
-        // Regla de negocio: mínimo 1 persona, máximo 10
-        if num_personas == 0 || num_personas > 10 {
-            return Err(ReservaError::NumeroPersonasInvalido);
+        // Regla de negocio: no se pueden hacer reservas en el pasado
+        if slot.inicio < Utc::now() {
+            return Err(ReservaError::SlotEnElPasado);
         }
 
-        // Regla de negocio: no se pueden hacer reservas en el pasado
-        if fecha < Utc::now() {
-            return Err(ReservaError::FechaInvalida);
+        // Regla de negocio: solo en horario laboral
+        if !slot.es_horario_laboral() {
+            return Err(ReservaError::SlotFueraDeHorarioLaboral);
+        }
+
+        // Regla de negocio: la descripción no puede estar vacía
+        if descripcion.trim().is_empty() {
+            return Err(ReservaError::DescripcionVacia);
         }
 
         Ok(Reserva {
             id,
-            nombre_cliente,
-            fecha,
-            num_personas,
+            empleado_id,
+            slot,
+            descripcion,
             estado: EstadoReserva::Pendiente,
         })
     }
@@ -63,6 +70,11 @@ impl Reserva {
     pub fn cancelar(&mut self) {
         self.estado = EstadoReserva::Cancelada;
     }
+
+    /// Verifica si la reserva está activa (no cancelada)
+    pub fn esta_activa(&self) -> bool {
+        self.estado != EstadoReserva::Cancelada
+    }
 }
 
 #[cfg(test)]
@@ -71,36 +83,128 @@ mod tests {
 
     #[test]
     fn test_crear_reserva_valida() {
-        let fecha = Utc::now() + chrono::Duration::days(1);
+        let mañana = Utc::now() + chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            mañana.year(),
+            mañana.month(),
+            mañana.day(),
+            10,
+        ).unwrap();
+
         let reserva = Reserva::new(
             "1".to_string(),
-            "Juan Pérez".to_string(),
-            fecha,
-            4,
+            "emp-001".to_string(),
+            slot,
+            "Reunión con cliente".to_string(),
         );
 
         assert!(reserva.is_ok());
         let r = reserva.unwrap();
         assert_eq!(r.estado, EstadoReserva::Pendiente);
+        assert_eq!(r.empleado_id, "emp-001");
     }
 
     #[test]
-    fn test_numero_personas_invalido() {
-        let fecha = Utc::now() + chrono::Duration::days(1);
+    fn test_slot_en_el_pasado() {
+        let ayer = Utc::now() - chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            ayer.year(),
+            ayer.month(),
+            ayer.day(),
+            10,
+        ).unwrap();
 
-        let reserva_cero = Reserva::new("1".to_string(), "Test".to_string(), fecha, 0);
-        assert_eq!(reserva_cero, Err(ReservaError::NumeroPersonasInvalido));
+        let reserva = Reserva::new(
+            "1".to_string(),
+            "emp-001".to_string(),
+            slot,
+            "Reunión".to_string(),
+        );
 
-        let reserva_muchas = Reserva::new("1".to_string(), "Test".to_string(), fecha, 11);
-        assert_eq!(reserva_muchas, Err(ReservaError::NumeroPersonasInvalido));
+        assert_eq!(reserva, Err(ReservaError::SlotEnElPasado));
+    }
+
+    #[test]
+    fn test_slot_fuera_horario_laboral() {
+        let mañana = Utc::now() + chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            mañana.year(),
+            mañana.month(),
+            mañana.day(),
+            20, // 8 PM - fuera de horario
+        ).unwrap();
+
+        let reserva = Reserva::new(
+            "1".to_string(),
+            "emp-001".to_string(),
+            slot,
+            "Reunión".to_string(),
+        );
+
+        assert_eq!(reserva, Err(ReservaError::SlotFueraDeHorarioLaboral));
+    }
+
+    #[test]
+    fn test_descripcion_vacia() {
+        let mañana = Utc::now() + chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            mañana.year(),
+            mañana.month(),
+            mañana.day(),
+            10,
+        ).unwrap();
+
+        let reserva = Reserva::new(
+            "1".to_string(),
+            "emp-001".to_string(),
+            slot,
+            "   ".to_string(), // solo espacios
+        );
+
+        assert_eq!(reserva, Err(ReservaError::DescripcionVacia));
     }
 
     #[test]
     fn test_confirmar_reserva() {
-        let fecha = Utc::now() + chrono::Duration::days(1);
-        let mut reserva = Reserva::new("1".to_string(), "Test".to_string(), fecha, 2).unwrap();
+        let mañana = Utc::now() + chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            mañana.year(),
+            mañana.month(),
+            mañana.day(),
+            14,
+        ).unwrap();
+
+        let mut reserva = Reserva::new(
+            "1".to_string(),
+            "emp-001".to_string(),
+            slot,
+            "Reunión importante".to_string(),
+        ).unwrap();
 
         reserva.confirmar();
         assert_eq!(reserva.estado, EstadoReserva::Confirmada);
+        assert!(reserva.esta_activa());
+    }
+
+    #[test]
+    fn test_cancelar_reserva() {
+        let mañana = Utc::now() + chrono::Duration::days(1);
+        let slot = Slot::from_date_and_hour(
+            mañana.year(),
+            mañana.month(),
+            mañana.day(),
+            14,
+        ).unwrap();
+
+        let mut reserva = Reserva::new(
+            "1".to_string(),
+            "emp-001".to_string(),
+            slot,
+            "Reunión".to_string(),
+        ).unwrap();
+
+        reserva.cancelar();
+        assert_eq!(reserva.estado, EstadoReserva::Cancelada);
+        assert!(!reserva.esta_activa());
     }
 }
