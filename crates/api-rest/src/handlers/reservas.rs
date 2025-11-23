@@ -37,11 +37,7 @@ pub async fn crear_reserva(
             let response: ReservaResponse = reserva.into();
             (StatusCode::CREATED, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }
 
@@ -55,13 +51,10 @@ pub async fn crear_reserva(
     ),
     tag = "Reservas"
 )]
-pub async fn listar_reservas(
-    Extension(service): Extension<Arc<dyn ReservaService>>,
-) -> Response {
+pub async fn listar_reservas(Extension(service): Extension<Arc<dyn ReservaService>>) -> Response {
     match service.listar_reservas().await {
         Ok(reservas) => {
-            let response: Vec<ReservaResponse> =
-                reservas.into_iter().map(|r| r.into()).collect();
+            let response: Vec<ReservaResponse> = reservas.into_iter().map(|r| r.into()).collect();
             (StatusCode::OK, Json(response)).into_response()
         }
         Err(e) => (
@@ -129,8 +122,7 @@ pub async fn listar_reservas_empleado(
 ) -> Response {
     match service.listar_reservas_empleado(&empleado_id).await {
         Ok(reservas) => {
-            let response: Vec<ReservaResponse> =
-                reservas.into_iter().map(|r| r.into()).collect();
+            let response: Vec<ReservaResponse> = reservas.into_iter().map(|r| r.into()).collect();
             (StatusCode::OK, Json(response)).into_response()
         }
         Err(e) => (
@@ -163,11 +155,7 @@ pub async fn confirmar_reserva(
             let response: ReservaResponse = reserva.into();
             (StatusCode::OK, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }
 
@@ -193,10 +181,6 @@ pub async fn cancelar_reserva(
             let response: ReservaResponse = reserva.into();
             (StatusCode::OK, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }
