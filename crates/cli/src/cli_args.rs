@@ -7,7 +7,12 @@ use clap::{Parser, Subcommand};
 #[command(about = "CLI para el Sistema de Reservas de Empleados", long_about = None)]
 #[command(version)]
 pub struct Cli {
-    #[arg(short, long, default_value = "http://localhost:3000/api", global = true)]
+    #[arg(
+        short,
+        long,
+        default_value = "http://localhost:3000/api",
+        global = true
+    )]
     pub url: String,
 
     #[command(subcommand)]
