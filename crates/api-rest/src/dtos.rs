@@ -19,9 +19,9 @@ pub struct CrearEmpleadoRequest {
 pub struct EmpleadoResponse {
     #[schema(example = "123e4567-e89b-12d3-a456-426614174000")]
     pub id: String,
-    #[schema(example = "Juan López")]
+    #[schema(example = "David López")]
     pub nombre: String,
-    #[schema(example = "juan@empresa.com")]
+    #[schema(example = "yo@devel0pez.com")]
     pub email: String,
     pub activo: bool,
 }
@@ -83,6 +83,20 @@ pub struct SlotInfo {
     pub inicio: DateTime<Utc>,
     pub fin: DateTime<Utc>,
     pub hora: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct CrearSalaRequest {
+    pub nombre: String,
+    pub capacidad: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct SalaResponse {
+    pub id: String,
+    pub nombre: String,
+    pub capacidad: u32,
+    pub activa: bool,
 }
 
 // ============= DTOs genéricos =============
