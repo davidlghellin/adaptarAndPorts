@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Empleado - Sistema de Reservas{% endblock %}
+
+{% block content %}
+<h2>Crear Nuevo Empleado</h2>
+
+<form method="post" action="/empleados/crear" class="form">
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required maxlength="100" placeholder="Ej: Juan López">
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required placeholder="Ej: juan@empresa.com">
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Crear Empleado</button>
+        <a href="/empleados" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

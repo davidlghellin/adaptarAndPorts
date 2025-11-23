@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - Sistema de Reservas{% endblock %}
+
+{% block content %}
+<h2>Lista de Empleados</h2>
+
+<div class="actions">
+    <a href="/empleados/nuevo" class="btn btn-primary">Crear Nuevo Empleado</a>
+</div>
+
+{% if empleados.is_empty() %}
+<div class="empty-state">
+    <p>No hay empleados registrados todavía.</p>
+    <a href="/empleados/nuevo" class="btn btn-primary">Crear el primero</a>
+</div>
+{% else %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for empleado in empleados %}
+        <tr>
+            <td>{{ empleado.nombre }}</td>
+            <td>{{ empleado.email }}</td>
+            <td>
+                {% if empleado.activo %}
+                <span class="badge badge-success">Activo</span>
+                {% else %}
+                <span class="badge badge-danger">Inactivo</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/empleados/{{ empleado.id }}/reservas" class="btn btn-sm">Ver Reservas</a>
+                {% if empleado.activo %}
+                <form method="post" action="/empleados/{{ empleado.id }}/desactivar" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-warning">Desactivar</button>
+                </form>
+                {% else %}
+                <form method="post" action="/empleados/{{ empleado.id }}/activar" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-success">Activar</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Sistema de Reservas{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h2>Bienvenido al Sistema de Reservas</h2>
+    <p>Gestiona empleados, reservas y consulta disponibilidad de forma simple.</p>
+</div>
+
+<div class="cards">
+    <div class="card">
+        <h3>Empleados</h3>
+        <p>Gestiona la lista de empleados del sistema</p>
+        <a href="/empleados" class="btn btn-primary">Ver Empleados</a>
+    </div>
+
+    <div class="card">
+        <h3>Reservas</h3>
+        <p>Crea y gestiona reservas de tiempo</p>
+        <a href="/reservas" class="btn btn-primary">Ver Reservas</a>
+    </div>
+
+    <div class="card">
+        <h3>Disponibilidad</h3>
+        <p>Consulta los horarios disponibles</p>
+        <a href="/disponibilidad" class="btn btn-primary">Ver Disponibilidad</a>
+    </div>
+</div>
+{% endblock %}

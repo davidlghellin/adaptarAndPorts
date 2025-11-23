@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Reservas - Sistema de Reservas{% endblock %}
+
+{% block content %}
+<h2>Lista de Reservas</h2>
+
+{% if reservas.is_empty() %}
+<div class="empty-state">
+    <p>No hay reservas registradas todavía.</p>
+</div>
+{% else %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Horario</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reserva in reservas %}
+        <tr>
+            <td>{{ reserva.slot_inicio.format("%Y-%m-%d") }}</td>
+            <td>{{ reserva.slot_inicio.format("%H:%M") }} - {{ reserva.slot_fin.format("%H:%M") }}</td>
+            <td>{{ reserva.descripcion }}</td>
+            <td>
+                {% if reserva.estado == "confirmada" %}
+                <span class="badge badge-success">Confirmada</span>
+                {% else if reserva.estado == "cancelada" %}
+                <span class="badge badge-danger">Cancelada</span>
+                {% else %}
+                <span class="badge badge-warning">Pendiente</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if reserva.estado == "pendiente" %}
+                <form method="post" action="/reservas/{{ reserva.id }}/confirmar" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-success">Confirmar</button>
+                </form>
+                <form method="post" action="/reservas/{{ reserva.id }}/cancelar" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -14,6 +14,9 @@ use utoipa::OpenApi;
             email = "contacto@reservas.com"
         )
     ),
+    servers(
+        (url = "/api", description = "API REST Server")
+    ),
     paths(
         crate::handlers::empleados::crear_empleado,
         crate::handlers::empleados::listar_empleados,

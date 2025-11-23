@@ -12,6 +12,7 @@ axum = "0.7"
 
 # Todas nuestras capas
 api-rest = { path = "../crates/api-rest" }
+web-ui = { path = "../crates/web-ui" }
 reservas-application = { path = "../crates/application" }
 reservas-adapters = { path = "../crates/adapters" }
 reservas-ports = { path = "../crates/ports" }
