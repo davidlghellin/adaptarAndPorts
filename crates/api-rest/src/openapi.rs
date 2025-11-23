@@ -30,6 +30,8 @@ use utoipa::OpenApi;
         crate::handlers::reservas::confirmar_reserva,
         crate::handlers::reservas::cancelar_reserva,
         crate::handlers::disponibilidad::obtener_disponibilidad,
+        crate::handlers::salas::listar_salas,
+        crate::handlers::salas::crear_sala,
     ),
     components(
         schemas(
@@ -41,13 +43,16 @@ use utoipa::OpenApi;
             TablaDisponibilidadResponse,
             SlotInfo,
             ErrorResponse,
-            MensajeResponse
+            MensajeResponse,
+            CrearSalaRequest,
+            SalaResponse
         )
     ),
     tags(
         (name = "Empleados", description = "Gestión de empleados"),
         (name = "Reservas", description = "Gestión de reservas de tiempo"),
-        (name = "Disponibilidad", description = "Consulta de disponibilidad de empleados")
+        (name = "Disponibilidad", description = "Consulta de disponibilidad de empleados"),
+        (name = "Salas", description = "Gestión de salas"),
     )
 )]
 pub struct ApiDoc;
