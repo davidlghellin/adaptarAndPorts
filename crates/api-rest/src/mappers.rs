@@ -3,7 +3,7 @@
 
 use crate::dtos::*;
 use chrono::Timelike;
-use reservas_domain::{Empleado, EstadoReserva, Reserva, Slot};
+use reservas_domain::{Empleado, EstadoReserva, Reserva, Sala, Slot};
 
 // ============= Mappers de Empleado =============
 
@@ -39,6 +39,16 @@ impl From<Reserva> for ReservaResponse {
     }
 }
 
+impl From<Sala> for SalaResponse {
+    fn from(sala: Sala) -> Self {
+        SalaResponse {
+            id: sala.id,
+            nombre: sala.nombre,
+            capacidad: sala.capacidad,
+            activa: true,
+        }
+    }
+}
 // ============= Mappers de Slot =============
 
 impl From<&Slot> for SlotInfo {

@@ -10,8 +10,11 @@
 // - Llamar al dominio
 
 use async_trait::async_trait;
-use reservas_domain::{Empleado, Reserva, Slot};
-use reservas_ports::{EmpleadoRepository, EmpleadoService, ReservaRepository, ReservaService};
+use reservas_domain::{Empleado, Reserva, Sala, Slot};
+use reservas_ports::{
+    EmpleadoRepository, EmpleadoService, ReservaRepository, ReservaService, SalaRepository,
+    SalaService,
+};
 use uuid::Uuid;
 
 /// Servicio de aplicación que implementa los casos de uso de reservas
@@ -160,5 +163,53 @@ impl<R: EmpleadoRepository + Send + Sync> EmpleadoService for EmpleadoServiceImp
         self.repository.actualizar(&empleado).await?;
 
         Ok(empleado)
+    }
+}
+
+pub struct SalaServiceImpl<R: SalaRepository> {
+    repository: R,
+}
+
+impl<R: SalaRepository> SalaServiceImpl<R> {
+    pub fn new(repository: R) -> Self {
+        Self { repository }
+    }
+}
+
+#[async_trait]
+impl<R: SalaRepository + Send + Sync> SalaService for SalaServiceImpl<R> {
+    async fn crear_sala(&self, nombre: String, capacidad: u32) -> Result<Sala, String> {
+        let id = Uuid::new_v4().to_string();
+        let sala = Sala::new(id, nombre, capacidad)?;
+        self.repository.guardar(&sala).await?;
+        Ok(sala)
+    }
+
+    async fn listar_salas(&self) -> Result<Vec<Sala>, String> {
+        self.repository.listar().await
+    }
+
+    async fn obtener_sala(&self, id: &str) -> Result<Option<Sala>, String> {
+        self.repository.obtener(id).await
+    }
+
+    async fn activar_sala(&self, id: &str) -> Result<(), String> {
+        let mut sala = self
+            .repository
+            .obtener(id)
+            .await?
+            .ok_or("Sala no encontrada")?;
+        sala.activar();
+        self.repository.actualizar(&sala).await
+    }
+
+    async fn desactivar_sala(&self, id: &str) -> Result<(), String> {
+        let mut sala = self
+            .repository
+            .obtener(id)
+            .await?
+            .ok_or("Sala no encontrada")?;
+        sala.desactivar();
+        self.repository.actualizar(&sala).await
     }
 }

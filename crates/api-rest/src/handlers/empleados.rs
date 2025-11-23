@@ -26,19 +26,12 @@ pub async fn crear_empleado(
     Extension(service): Extension<Arc<dyn EmpleadoService>>,
     Json(request): Json<CrearEmpleadoRequest>,
 ) -> Response {
-    match service
-        .crear_empleado(request.nombre, request.email)
-        .await
-    {
+    match service.crear_empleado(request.nombre, request.email).await {
         Ok(empleado) => {
             let response: EmpleadoResponse = empleado.into();
             (StatusCode::CREATED, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }
 
@@ -52,13 +45,10 @@ pub async fn crear_empleado(
     ),
     tag = "Empleados"
 )]
-pub async fn listar_empleados(
-    Extension(service): Extension<Arc<dyn EmpleadoService>>,
-) -> Response {
+pub async fn listar_empleados(Extension(service): Extension<Arc<dyn EmpleadoService>>) -> Response {
     match service.listar_empleados().await {
         Ok(empleados) => {
-            let response: Vec<EmpleadoResponse> =
-                empleados.into_iter().map(|e| e.into()).collect();
+            let response: Vec<EmpleadoResponse> = empleados.into_iter().map(|e| e.into()).collect();
             (StatusCode::OK, Json(response)).into_response()
         }
         Err(e) => (
@@ -129,11 +119,7 @@ pub async fn desactivar_empleado(
             let response: EmpleadoResponse = empleado.into();
             (StatusCode::OK, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }
 
@@ -159,10 +145,6 @@ pub async fn activar_empleado(
             let response: EmpleadoResponse = empleado.into();
             (StatusCode::OK, Json(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(ErrorResponse { error: e }),
-        )
-            .into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(ErrorResponse { error: e })).into_response(),
     }
 }

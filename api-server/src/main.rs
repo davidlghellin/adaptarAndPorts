@@ -9,8 +9,11 @@
 // 4. Conectamos todo mediante inyección de dependencias
 // 5. Arrancamos el servidor
 
-use reservas_adapters::{InMemoryEmpleadoRepository, InMemoryReservaRepository};
-use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl};
+use reservas_adapters::{
+    InMemoryEmpleadoRepository, InMemoryReservaRepository, InMemorySalaRepository,
+};
+use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl, SalaServiceImpl};
+use reservas_ports::{EmpleadoService, ReservaService, SalaService};
 use std::sync::Arc;
 use tracing::{info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -31,27 +34,29 @@ async fn main() {
 
     // 1. ADAPTADORES DE SALIDA: Repositorios en memoria
     info!("🔧 Configurando adaptadores de salida (repositorios)");
-    let empleado_repo = InMemoryEmpleadoRepository::new();
-    let reserva_repo = InMemoryReservaRepository::new();
+    let empleado_repo: InMemoryEmpleadoRepository = InMemoryEmpleadoRepository::new();
+    let reserva_repo: InMemoryReservaRepository = InMemoryReservaRepository::new();
+    let sala_repository: InMemorySalaRepository = InMemorySalaRepository::new();
 
     // 2. SERVICIOS DE APLICACIÓN: Casos de uso
     info!("⚙️  Configurando servicios de aplicación");
-    let empleado_service = Arc::new(EmpleadoServiceImpl::new(empleado_repo))
-        as Arc<dyn reservas_ports::EmpleadoService>;
-    let reserva_service = Arc::new(ReservaServiceImpl::new(reserva_repo))
-        as Arc<dyn reservas_ports::ReservaService>;
+    let empleado_service: Arc<dyn EmpleadoService> =
+        Arc::new(EmpleadoServiceImpl::new(empleado_repo))
+            as Arc<dyn reservas_ports::EmpleadoService>;
+    let reserva_service: Arc<dyn ReservaService> =
+        Arc::new(ReservaServiceImpl::new(reserva_repo)) as Arc<dyn reservas_ports::ReservaService>;
+    let sala_service: Arc<dyn SalaService> =
+        Arc::new(SalaServiceImpl::new(sala_repository)) as Arc<dyn reservas_ports::SalaService>;
 
     // 3. ADAPTADORES DE ENTRADA: API REST + Web UI
     info!("🌐 Configurando adaptadores de entrada");
-    let api_router = api_rest::crear_router(
-        Arc::clone(&empleado_service),
-        Arc::clone(&reserva_service),
-    );
+    let api_router =
+        api_rest::crear_router(Arc::clone(&empleado_service), Arc::clone(&reserva_service),Arc::clone(&sala_service));
     let web_router = web_ui::crear_router_web(
         Arc::clone(&empleado_service),
         Arc::clone(&reserva_service),
+        Arc::clone(&sala_service),
     );
-
     // Combinar ambos routers: Web UI en la raíz, API REST bajo /api
     let app = web_router.merge(axum::Router::new().nest("/api", api_router));
 

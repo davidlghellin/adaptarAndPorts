@@ -231,10 +231,16 @@ impl ApiClient {
         }
     }
 
-    pub fn listar_reservas_empleado(&self, empleado_id: &str) -> Result<Vec<ReservaResponse>, String> {
+    pub fn listar_reservas_empleado(
+        &self,
+        empleado_id: &str,
+    ) -> Result<Vec<ReservaResponse>, String> {
         let response = self
             .client
-            .get(format!("{}/empleados/{}/reservas", self.base_url, empleado_id))
+            .get(format!(
+                "{}/empleados/{}/reservas",
+                self.base_url, empleado_id
+            ))
             .send()
             .map_err(|e| format!("Error de conexión: {}", e))?;
 
@@ -287,7 +293,10 @@ impl ApiClient {
 
     // Disponibilidad
 
-    pub fn obtener_disponibilidad(&self, fecha: &str) -> Result<TablaDisponibilidadResponse, String> {
+    pub fn obtener_disponibilidad(
+        &self,
+        fecha: &str,
+    ) -> Result<TablaDisponibilidadResponse, String> {
         let response = self
             .client
             .get(format!("{}/disponibilidad?fecha={}", self.base_url, fecha))

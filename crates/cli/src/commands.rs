@@ -166,7 +166,8 @@ pub fn crear_reserva(
         Ok(reserva) => {
             println!("{}", "✓ Reserva creada exitosamente".green());
             println!("  ID: {}", reserva.id);
-            println!("  Slot: {} - {}",
+            println!(
+                "  Slot: {} - {}",
                 reserva.slot_inicio.format("%Y-%m-%d %H:%M"),
                 reserva.slot_fin.format("%H:%M")
             );
@@ -195,7 +196,8 @@ pub fn listar_reservas(client: &ApiClient) {
                     id: r.id,
                     empleado_id: r.empleado_id,
                     fecha: r.slot_inicio.format("%Y-%m-%d").to_string(),
-                    horario: format!("{}-{}",
+                    horario: format!(
+                        "{}-{}",
                         r.slot_inicio.format("%H:%M"),
                         r.slot_fin.format("%H:%M")
                     ),
@@ -216,7 +218,10 @@ pub fn listar_reservas(client: &ApiClient) {
 }
 
 pub fn listar_reservas_empleado(client: &ApiClient, empleado_id: String) {
-    println!("{}", format!("Obteniendo reservas del empleado {}...", empleado_id).cyan());
+    println!(
+        "{}",
+        format!("Obteniendo reservas del empleado {}...", empleado_id).cyan()
+    );
 
     match client.listar_reservas_empleado(&empleado_id) {
         Ok(reservas) => {
@@ -231,7 +236,8 @@ pub fn listar_reservas_empleado(client: &ApiClient, empleado_id: String) {
                     id: r.id,
                     empleado_id: r.empleado_id.clone(),
                     fecha: r.slot_inicio.format("%Y-%m-%d").to_string(),
-                    horario: format!("{}-{}",
+                    horario: format!(
+                        "{}-{}",
                         r.slot_inicio.format("%H:%M"),
                         r.slot_fin.format("%H:%M")
                     ),
@@ -282,11 +288,17 @@ pub fn cancelar_reserva(client: &ApiClient, id: String) {
 // ============= Comandos de Disponibilidad =============
 
 pub fn ver_disponibilidad(client: &ApiClient, fecha: String) {
-    println!("{}", format!("Obteniendo disponibilidad para {}...", fecha).cyan());
+    println!(
+        "{}",
+        format!("Obteniendo disponibilidad para {}...", fecha).cyan()
+    );
 
     match client.obtener_disponibilidad(&fecha) {
         Ok(tabla) => {
-            println!("\n{}", format!("Disponibilidad - {}", tabla.fecha).green().bold());
+            println!(
+                "\n{}",
+                format!("Disponibilidad - {}", tabla.fecha).green().bold()
+            );
             println!("\n{}", "Slots disponibles:".bold());
 
             for slot in &tabla.slots {
@@ -296,7 +308,8 @@ pub fn ver_disponibilidad(client: &ApiClient, fecha: String) {
             println!("\n{}", "Por empleado:".bold());
 
             // Agrupar por empleado
-            let mut por_empleado: std::collections::HashMap<String, Vec<_>> = std::collections::HashMap::new();
+            let mut por_empleado: std::collections::HashMap<String, Vec<_>> =
+                std::collections::HashMap::new();
 
             for disp in &tabla.disponibilidad {
                 por_empleado
@@ -317,11 +330,16 @@ pub fn ver_disponibilidad(client: &ApiClient, fecha: String) {
                     let info = if slot.disponible {
                         "Disponible".to_string()
                     } else {
-                        format!("Ocupado: {}",
-                            slot.descripcion_reserva.as_ref().unwrap_or(&"Sin descripción".to_string()))
+                        format!(
+                            "Ocupado: {}",
+                            slot.descripcion_reserva
+                                .as_ref()
+                                .unwrap_or(&"Sin descripción".to_string())
+                        )
                     };
 
-                    println!("    {} {}:00 - {}",
+                    println!(
+                        "    {} {}:00 - {}",
                         simbolo,
                         slot.slot_inicio.format("%H"),
                         info

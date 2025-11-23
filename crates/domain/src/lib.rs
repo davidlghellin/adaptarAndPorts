@@ -15,6 +15,9 @@ pub mod empleado;
 pub mod reserva;
 pub mod slot;
 
+pub mod sala;
+pub use sala::Sala;
+
 pub use disponibilidad::DisponibilidadService;
 pub use empleado::Empleado;
 pub use reserva::{EstadoReserva, Reserva, ReservaError};

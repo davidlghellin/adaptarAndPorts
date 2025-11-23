@@ -5,8 +5,8 @@
 // como binario ejecutable a través del crate cli-app
 
 pub mod api_client;
-pub mod commands;
 pub mod cli_args;
+pub mod commands;
 
 // Re-exportar tipos principales para facilitar el uso
 pub use api_client::ApiClient;
