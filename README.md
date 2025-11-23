@@ -2,44 +2,119 @@
 
 Sistema de gestión de reservas implementado con arquitectura hexagonal (puertos y adaptadores) usando múltiples crates de Rust.
 
+## 🚀 Quick Start
+
+```bash
+# Ejecutar el servidor
+cargo run -p api-server
+
+# Abrir en el navegador
+open http://localhost:3000/          # Interfaz Web
+open http://localhost:3000/api/swagger-ui  # API REST docs
+
+# O usar la CLI
+cargo run -p cli-app -- empleado crear --nombre "Ana" --email "ana@empresa.com"
+cargo run -p cli-app -- empleado listar
+```
+
 ## 🎯 Objetivo Educativo
 
 Este proyecto está diseñado para aprender arquitectura hexagonal paso a paso, con separación clara de responsabilidades mediante crates independientes.
+
+**Tres formas de interactuar con el mismo dominio**:
+1. **Web UI** - Interfaz HTML simple en la raíz (`/`)
+2. **API REST** - Endpoints JSON documentados bajo `/api`
+3. **CLI** - Cliente de línea de comandos
+
+Todos comparten los mismos servicios y repositorios, demostrando la flexibilidad de la arquitectura hexagonal.
 
 ## 📦 Estructura de Crates
 
 ### [crates/domain](crates/domain/) - El Núcleo
 **Sin dependencias de infraestructura**
-- Entidades de negocio (`Reserva`)
-- Reglas de negocio (1-10 personas, fecha futura)
+- Entidades de negocio (`Empleado`, `Reserva`, `Slot`)
+- Reglas de negocio (validaciones, estados)
 - Estados (`Pendiente`, `Confirmada`, `Cancelada`)
 
 ### [crates/ports](crates/ports/) - Los Contratos
 **Depende solo de: `domain`**
-- `ReservaService` (puerto de entrada - casos de uso)
-- `ReservaRepository` (puerto de salida - persistencia)
+- `EmpleadoService` y `ReservaService` (puertos de entrada - casos de uso)
+- `EmpleadoRepository` y `ReservaRepository` (puertos de salida - persistencia)
 
 ### [crates/application](crates/application/) - Casos de Uso
 **Depende de: `domain`, `ports`**
-- `ReservaServiceImpl` - Implementa los casos de uso
+- `EmpleadoServiceImpl` y `ReservaServiceImpl` - Implementan los casos de uso
 - Orquesta el dominio con los repositorios
 
 ### [crates/adapters](crates/adapters/) - Implementaciones
 **Depende de: `domain`, `ports`**
-- `InMemoryReservaRepository` - Repositorio en memoria con HashMap
+- `InMemoryEmpleadoRepository` y `InMemoryReservaRepository` - Repositorios en memoria con HashMap
 - Futuros: PostgreSQL, MongoDB, etc.
 
-### [reservas-app](reservas-app/) - Binario Principal
-**Depende de: todos**
-- Ensambla la aplicación
+### [crates/api-rest](crates/api-rest/) - API REST
+**Depende de: `domain`, `ports`**
+- API REST con Axum
+- Documentación OpenAPI/Swagger
+- Endpoints JSON para empleados y reservas
+
+### [crates/web-ui](crates/web-ui/) - Interfaz Web
+**Depende de: `domain`, `ports`**
+- Interfaz HTML simple con Askama templates
+- Sin JavaScript, server-side rendering
+- Páginas para gestionar empleados y reservas
+
+### [crates/cli](crates/cli/) - CLI Interactiva
+**Depende de: `domain`, `ports`**
+- Cliente CLI que consume la API REST
+- Comandos para gestionar empleados y reservas
+
+### [api-server](api-server/) - Servidor HTTP
+**Depende de: `application`, `adapters`, `api-rest`, `web-ui`**
+- Ensambla la API REST y la Web UI
 - Inyección de dependencias
-- Punto de entrada
+- Servidor HTTP unificado
+
+### [cli-app](cli-app/) - Aplicación CLI
+**Depende de: `cli`**
+- Ejecutable de línea de comandos
+- Cliente para consumir la API
 
 ## 🚀 Comandos
 
-### Ejecutar la aplicación:
+### Ejecutar el servidor HTTP (API REST + Web UI):
 ```bash
-cargo run
+cargo run -p api-server
+```
+
+Esto inicia el servidor en `http://localhost:3000` con:
+- **Interfaz Web**: http://localhost:3000/
+- **API REST**: http://localhost:3000/api/...
+- **Swagger UI**: http://localhost:3000/api/swagger-ui
+
+### Usar la CLI:
+```bash
+# Listar empleados
+cargo run -p cli-app -- empleado listar
+
+# Crear empleado
+cargo run -p cli-app -- empleado crear --nombre "Juan López" --email "juan@empresa.com"
+
+# Activar/desactivar empleado
+cargo run -p cli-app -- empleado activar --id <empleado-id>
+cargo run -p cli-app -- empleado desactivar --id <empleado-id>
+
+# Listar reservas
+cargo run -p cli-app -- reserva listar
+
+# Crear reserva
+cargo run -p cli-app -- reserva crear --empleado-id <id> --fecha 2025-11-25 --hora 9 --descripcion "Reunión"
+
+# Confirmar/cancelar reserva
+cargo run -p cli-app -- reserva confirmar --id <reserva-id>
+cargo run -p cli-app -- reserva cancelar --id <reserva-id>
+
+# Ver disponibilidad
+cargo run -p cli-app -- disponibilidad --fecha 2025-11-25
 ```
 
 ### Ejecutar tests:
@@ -56,7 +131,7 @@ cargo test -p reservas-adapters
 
 ### Ver el grafo de dependencias:
 ```bash
-cargo tree -p reservas-app
+cargo tree -p api-server
 ```
 
 ### Compilar todo:
@@ -69,16 +144,55 @@ cargo build
 - [ARQUITECTURA.md](ARQUITECTURA.md) - Conceptos y diagramas de arquitectura hexagonal
 - [CRATES.md](CRATES.md) - Explicación de la estructura multi-crate
 
+## 🌐 Interfaz Web
+
+La interfaz web está disponible en la raíz del servidor (`http://localhost:3000/`):
+
+- **Página principal**: Dashboard con acceso a todas las secciones
+- **Gestión de Empleados**: Crear, listar, activar/desactivar empleados
+- **Gestión de Reservas**: Listar, confirmar y cancelar reservas
+- **Diseño simple**: HTML básico con CSS, sin JavaScript
+
+Características:
+- ✅ Server-side rendering con Askama templates
+- ✅ Formularios HTML nativos
+- ✅ Integración completa con los servicios de aplicación
+- ✅ Todo en Rust, sin dependencias de frontend
+
+## 🔌 API REST
+
+La API REST está disponible bajo `/api` con documentación interactiva:
+
+**Empleados**:
+- `POST /api/empleados` - Crear empleado
+- `GET /api/empleados` - Listar empleados
+- `GET /api/empleados/:id` - Obtener empleado
+- `POST /api/empleados/:id/activar` - Activar empleado
+- `POST /api/empleados/:id/desactivar` - Desactivar empleado
+
+**Reservas**:
+- `POST /api/reservas` - Crear reserva
+- `GET /api/reservas` - Listar reservas
+- `GET /api/reservas/:id` - Obtener reserva
+- `POST /api/reservas/:id/confirmar` - Confirmar reserva
+- `POST /api/reservas/:id/cancelar` - Cancelar reserva
+- `GET /api/empleados/:id/reservas` - Reservas de un empleado
+
+**Disponibilidad**:
+- `GET /api/disponibilidad?fecha=YYYY-MM-DD` - Tabla de disponibilidad
+
 ## ✅ Tests Incluidos
 
-**Dominio** (3 tests):
-- Creación de reserva válida
-- Validación de número de personas
-- Confirmación de reserva
+**Dominio**:
+- Creación y validación de empleados
+- Creación y validación de reservas
+- Validación de slots horarios
+- Confirmación y cancelación de reservas
 
-**Adaptadores** (2 tests):
-- Guardar y obtener reserva
-- Actualizar estado de reserva
+**Adaptadores**:
+- Guardar y obtener empleados
+- Guardar y obtener reservas
+- Actualizar estados
 
 ## 🎓 Conceptos Clave
 
@@ -94,14 +208,17 @@ use reservas_domain::Reserva;
 
 ### Inyección de Dependencias
 ```rust
-// Creamos el adaptador concreto
-let repository = InMemoryReservaRepository::new();
+// Creamos los adaptadores concretos
+let empleado_repository = InMemoryEmpleadoRepository::new();
+let reserva_repository = InMemoryReservaRepository::new();
 
-// Lo inyectamos en la aplicación
-let service = ReservaServiceImpl::new(repository);
+// Los inyectamos en los servicios
+let empleado_service = EmpleadoServiceImpl::new(empleado_repository);
+let reserva_service = ReservaServiceImpl::new(reserva_repository);
 
-// Usamos el servicio a través de la interfaz
-service.crear_reserva(...).await?;
+// Usamos los servicios a través de las interfaces
+empleado_service.crear_empleado(...).await?;
+reserva_service.crear_reserva(...).await?;
 ```
 
 ### Ventajas
@@ -111,35 +228,50 @@ service.crear_reserva(...).await?;
 3. **Reutilización** - Otros proyectos pueden usar solo el dominio
 4. **Compilación paralela** - Rust compila crates independientes en paralelo
 5. **Cambios localizados** - Cambiar de InMemory a Postgres no toca el dominio
+6. **Múltiples adaptadores** - API REST, Web UI y CLI comparten los mismos servicios
 
 ## 🔄 Flujo de una Operación
 
 ```
-1. Usuario → reservas-app/main.rs
+1. Usuario → Web UI (/) o API REST (/api) o CLI
               ↓
-2. ReservaServiceImpl (application)
-   - Genera UUID
-   - Llama a Reserva::new() (domain)
+2. Handler (web-ui/api-rest/cli)
+   - Recibe petición HTTP o comando
               ↓
-3. Reserva valida reglas de negocio (domain)
-   - ¿1-10 personas? ✓
-   - ¿Fecha futura? ✓
+3. Service (application)
+   - EmpleadoServiceImpl o ReservaServiceImpl
+   - Genera UUID, valida datos
               ↓
-4. Guarda usando el puerto (ports)
-   repository.guardar(&reserva)
+4. Domain (domain)
+   - Empleado::new() o Reserva::new()
+   - Valida reglas de negocio
               ↓
-5. InMemoryRepository (adapters)
-   - Guarda en HashMap
+5. Repository (ports → adapters)
+   - repository.guardar(&entidad)
+   - InMemoryRepository guarda en HashMap
+              ↓
+6. Respuesta → Usuario
+   - JSON (API REST) o HTML (Web UI) o texto (CLI)
 ```
+
+## ✨ Características Implementadas
+
+- ✅ API REST con Axum y documentación Swagger/OpenAPI
+- ✅ Interfaz Web HTML con Askama templates
+- ✅ CLI interactiva que consume la API REST
+- ✅ Gestión completa de empleados (crear, listar, activar/desactivar)
+- ✅ Gestión completa de reservas (crear, listar, confirmar, cancelar)
+- ✅ Tabla de disponibilidad por fecha
+- ✅ Validación de slots horarios
 
 ## 🚧 Próximos Pasos
 
 - [ ] Añadir adaptador PostgreSQL
-- [ ] API REST con Axum
-- [ ] CLI interactivo
 - [ ] Validación de solapamiento de horarios
 - [ ] Eventos de dominio
-- [ ] Capacidad máxima del restaurante
+- [ ] Capacidad máxima del sistema
+- [ ] Notificaciones por email
+- [ ] Sistema de autenticación y autorización
 
 ## 📖 Para Aprender Más
 
@@ -149,8 +281,23 @@ service.crear_reserva(...).await?;
 
 ## 🛠️ Tecnologías
 
+**Core**:
 - **Rust** 2021 edition
 - **Tokio** - Runtime asíncrono
-- **Chrono** - Manejo de fechas
+- **Chrono** - Manejo de fechas y horarios
 - **UUID** - Generación de IDs únicos
 - **Async-trait** - Traits asíncronos
+
+**API REST**:
+- **Axum** 0.7 - Framework web
+- **Utoipa** - Generación de OpenAPI/Swagger
+- **Serde** - Serialización JSON
+
+**Web UI**:
+- **Askama** - Templates HTML (similar a Jinja)
+- **Tower-HTTP** - Servir archivos estáticos
+- **CSS** vanilla - Sin frameworks frontend
+
+**CLI**:
+- **Clap** - Parser de argumentos
+- **Reqwest** - Cliente HTTP para consumir la API

@@ -16,9 +16,15 @@ pub fn crear_router(
     empleado_service: Arc<dyn EmpleadoService>,
     reserva_service: Arc<dyn ReservaService>,
 ) -> Router {
+    let openapi = ApiDoc::openapi();
+
     Router::new()
-        // Swagger UI
-        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        // Swagger UI - el path debe ser absoluto incluyendo /api
+        .merge(SwaggerUi::new("/swagger-ui").url("/api/api-docs/openapi.json", openapi.clone()))
+        // Ruta para servir el OpenAPI JSON
+        .route("/api-docs/openapi.json", get(|| async move {
+            axum::Json(openapi)
+        }))
         // Rutas de empleados
         .route("/empleados", post(handlers::crear_empleado))
         .route("/empleados", get(handlers::listar_empleados))

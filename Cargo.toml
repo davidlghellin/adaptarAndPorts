@@ -7,6 +7,7 @@ members = [
     "crates/adapters",
     "crates/api-rest",
     "crates/cli",
+    "crates/web-ui",
     "reservas-app",
     "api-server",
     "cli-app",
