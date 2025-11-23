@@ -68,15 +68,18 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 **Orden de implementación:**
 
 1. **Domain** (crates/domain) - Sin dependencias externas
+
    - Crear entidades (`Empleado`, `Reserva`, `Slot`)
    - Implementar validaciones
    - Definir enums (`EstadoReserva`)
 
 2. **Ports** (crates/ports) - Depende solo de domain
+
    - Definir traits de servicios (`EmpleadoService`, `ReservaService`)
    - Definir traits de repositorios (`EmpleadoRepository`, `ReservaRepository`)
 
 3. **Application** (crates/application) - Depende de domain y ports
+
    - Implementar servicios (`EmpleadoServiceImpl`, `ReservaServiceImpl`)
    - Orquestar lógica de negocio
 
@@ -86,12 +89,14 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 ### Paso 4: Implementar adaptadores de entrada
 
 **API REST** (crates/api-rest):
+
 ```bash
 cd crates/api-rest
 # Agregar dependencias en Cargo.toml
 ```
 
 **Web UI** (crates/web-ui):
+
 ```bash
 cd crates/web-ui
 # Crear carpetas
@@ -99,6 +104,7 @@ mkdir -p templates static src
 ```
 
 **CLI** (crates/cli):
+
 ```bash
 cd crates/cli
 # Implementar cliente HTTP y comandos
@@ -107,6 +113,7 @@ cd crates/cli
 ### Paso 5: Ensamblar las aplicaciones
 
 **API Server** (api-server/src/main.rs):
+
 ```rust
 // 1. Crear repositorios
 let empleado_repo = InMemoryEmpleadoRepository::new();
@@ -167,6 +174,7 @@ let app = web_router.merge(Router::new().nest("/api", api_router));
 ```
 
 **Reglas de dependencias:**
+
 - Domain: **NO** depende de nada
 - Ports: Depende solo de Domain
 - Application: Depende de Domain y Ports
@@ -220,6 +228,7 @@ impl Sala {
 ```
 
 Exportar en `crates/domain/src/lib.rs`:
+
 ```rust
 pub mod sala;
 pub use sala::Sala;
@@ -228,12 +237,13 @@ pub use sala::Sala;
 ### 2. Ports (crates/ports/src/sala.rs)
 
 **Repository trait:**
+
 ```rust
 use async_trait::async_trait;
 use reservas_domain::Sala;
 
 #[async_trait]
-pub trait SalaRepository: Send + Sync {
+pub trait SalaRepository {
     async fn guardar(&self, sala: &Sala) -> Result<(), String>;
     async fn obtener(&self, id: &str) -> Result<Option<Sala>, String>;
     async fn listar(&self) -> Result<Vec<Sala>, String>;
@@ -242,6 +252,7 @@ pub trait SalaRepository: Send + Sync {
 ```
 
 **Service trait:**
+
 ```rust
 use async_trait::async_trait;
 use reservas_domain::Sala;
@@ -257,6 +268,7 @@ pub trait SalaService: Send + Sync {
 ```
 
 Exportar en `crates/ports/src/lib.rs`:
+
 ```rust
 pub mod sala;
 pub use sala::{SalaRepository, SalaService};
@@ -271,18 +283,18 @@ use reservas_ports::{SalaRepository, SalaService};
 use std::sync::Arc;
 use uuid::Uuid;
 
-pub struct SalaServiceImpl {
-    repository: Arc<dyn SalaRepository>,
+pub struct SalaServiceImpl<R: SalaRepository> {
+    repository: R,
 }
 
-impl SalaServiceImpl {
-    pub fn new(repository: Arc<dyn SalaRepository>) -> Self {
+impl<R: SalaRepository> SalaServiceImpl<R> {
+    pub fn new(repository: R) -> Self {
         Self { repository }
     }
 }
 
 #[async_trait]
-impl SalaService for SalaServiceImpl {
+impl<R: SalaRepository + Send + Sync> SalaService for SalaServiceImpl<R> {
     async fn crear_sala(&self, nombre: String, capacidad: u32) -> Result<Sala, String> {
         let id = Uuid::new_v4().to_string();
         let sala = Sala::new(id, nombre, capacidad)?;
@@ -299,14 +311,20 @@ impl SalaService for SalaServiceImpl {
     }
 
     async fn activar_sala(&self, id: &str) -> Result<(), String> {
-        let mut sala = self.repository.obtener(id).await?
+        let mut sala = self
+            .repository
+            .obtener(id)
+            .await?
             .ok_or("Sala no encontrada")?;
         sala.activar();
         self.repository.actualizar(&sala).await
     }
 
     async fn desactivar_sala(&self, id: &str) -> Result<(), String> {
-        let mut sala = self.repository.obtener(id).await?
+        let mut sala = self
+            .repository
+            .obtener(id)
+            .await?
             .ok_or("Sala no encontrada")?;
         sala.desactivar();
         self.repository.actualizar(&sala).await
@@ -321,16 +339,23 @@ use async_trait::async_trait;
 use reservas_domain::Sala;
 use reservas_ports::SalaRepository;
 use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::sync::RwLock;
 
 pub struct InMemorySalaRepository {
-    salas: RwLock<HashMap<String, Sala>>,
+    salas: Arc<RwLock<HashMap<String, Sala>>>,
+}
+
+impl Default for InMemorySalaRepository {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl InMemorySalaRepository {
     pub fn new() -> Self {
         Self {
-            salas: RwLock::new(HashMap::new()),
+            salas: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }
@@ -463,10 +488,13 @@ use reservas_ports::SalaService;
 use std::sync::Arc;
 use crate::templates::{SalasTemplate, SalaView};
 
+
 pub async fn listar_salas_page(
     Extension(service): Extension<Arc<dyn SalaService>>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    let salas = service.listar_salas().await
+    let salas = service
+        .listar_salas()
+        .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let salas_view: Vec<SalaView> = salas
@@ -486,7 +514,9 @@ pub async fn activar_sala(
     Extension(service): Extension<Arc<dyn SalaService>>,
     Path(id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    service.activar_sala(&id).await
+    service
+        .activar_sala(&id)
+        .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Redirect::to("/salas"))
 }
@@ -495,7 +525,9 @@ pub async fn desactivar_sala(
     Extension(service): Extension<Arc<dyn SalaService>>,
     Path(id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    service.desactivar_sala(&id).await
+    service
+        .desactivar_sala(&id)
+        .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Redirect::to("/salas"))
 }
@@ -527,16 +559,16 @@ pub fn crear_router_web(
 
 ```html
 <nav class="navbar">
-    <div class="container">
-        <h1>Sistema de Reservas</h1>
-        <ul>
-            <li><a href="/">Inicio</a></li>
-            <li><a href="/empleados">Empleados</a></li>
-            <li><a href="/salas">Salas</a></li>  <!-- NUEVA -->
-            <li><a href="/reservas">Reservas</a></li>
-            <li><a href="/disponibilidad">Disponibilidad</a></li>
-        </ul>
-    </div>
+  <div class="container">
+    <h1>Sistema de Reservas</h1>
+    <ul>
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/empleados">Empleados</a></li>
+      <li><a href="/salas">Salas</a></li><!-- NUEVA -->
+      <li><a href="/reservas">Reservas</a></li>
+      <li><a href="/disponibilidad">Disponibilidad</a></li>
+    </ul>
+  </div>
 </nav>
 ```
 
@@ -544,16 +576,23 @@ pub fn crear_router_web(
 
 ```rust
 // Crear repositorio y servicio
-let sala_repository = Arc::new(InMemorySalaRepository::new());
-let sala_service: Arc<dyn SalaService> = Arc::new(
-    SalaServiceImpl::new(Arc::clone(&sala_repository))
-);
+let sala_repository: InMemorySalaRepository = InMemorySalaRepository::new();
+let sala_service: Arc<dyn SalaService> =
+        Arc::new(SalaServiceImpl::new(sala_repository)) as Arc<dyn reservas_ports::SalaService>;
+
+// añadimos al api_router
+let api_router =
+        api_rest::crear_router(
+            Arc::clone(&empleado_service), 
+            Arc::clone(&reserva_service),
+            Arc::clone(&sala_service) // nueva
+        );
 
 // Pasar al router
 let web_router = web_ui::crear_router_web(
-    empleado_service,
-    reserva_service,
-    sala_service,  // NUEVO
+    Arc::clone(&empleado_service),
+    Arc::clone(&reserva_service),
+    Arc::clone(&sala_service), // nueva
 );
 ```
 
@@ -587,47 +626,42 @@ pub struct SalaResponse {
 ### 2. Crear handlers (crates/api-rest/src/handlers.rs)
 
 ```rust
+use crate::dtos::{CrearSalaRequest, ErrorResponse, SalaResponse};
 use axum::{
-    extract::{Extension, Path},
     http::StatusCode,
-    Json,
+    response::{IntoResponse, Response},
+    Extension, Json,
 };
 use reservas_ports::SalaService;
 use std::sync::Arc;
-use crate::dtos::{CrearSalaRequest, SalaResponse};
 
 /// Listar todas las salas
 #[utoipa::path(
     get,
-    path = "/api/salas",
+    path = "/salas",
     responses(
         (status = 200, description = "Lista de salas", body = [SalaResponse])
     ),
     tag = "Salas"
 )]
-pub async fn listar_salas(
-    Extension(service): Extension<Arc<dyn SalaService>>,
-) -> Result<Json<Vec<SalaResponse>>, StatusCode> {
-    let salas = service.listar_salas().await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    let response: Vec<SalaResponse> = salas
-        .into_iter()
-        .map(|s| SalaResponse {
-            id: s.id,
-            nombre: s.nombre,
-            capacidad: s.capacidad,
-            activa: s.activa,
-        })
-        .collect();
-
-    Ok(Json(response))
+pub async fn listar_salas(Extension(service): Extension<Arc<dyn SalaService>>) -> Response {
+    match service.listar_salas().await {
+        Ok(salas) => {
+            let response: Vec<SalaResponse> = salas.into_iter().map(|e| e.into()).collect();
+            (StatusCode::OK, Json(response)).into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorResponse { error: e }),
+        )
+            .into_response(),
+    }
 }
 
 /// Crear nueva sala
 #[utoipa::path(
     post,
-    path = "/api/salas",
+    path = "/salas",
     request_body = CrearSalaRequest,
     responses(
         (status = 201, description = "Sala creada", body = SalaResponse)
@@ -638,7 +672,9 @@ pub async fn crear_sala(
     Extension(service): Extension<Arc<dyn SalaService>>,
     Json(request): Json<CrearSalaRequest>,
 ) -> Result<(StatusCode, Json<SalaResponse>), StatusCode> {
-    let sala = service.crear_sala(request.nombre, request.capacidad).await
+    let sala = service
+        .crear_sala(request.nombre, request.capacidad)
+        .await
         .map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let response = SalaResponse {
@@ -864,26 +900,31 @@ Cuando agregues una nueva funcionalidad completa (entidad + Web + API + CLI):
 ### Checklist de desarrollo
 
 1. **Domain** ✓
+
    - [ ] Crear entidad con validaciones
    - [ ] Escribir tests unitarios
    - [ ] Exportar en lib.rs
 
 2. **Ports** ✓
+
    - [ ] Definir trait Repository
    - [ ] Definir trait Service
    - [ ] Exportar en lib.rs
 
 3. **Application** ✓
+
    - [ ] Implementar ServiceImpl
    - [ ] Escribir tests de integración
    - [ ] Exportar en lib.rs
 
 4. **Adapters** ✓
+
    - [ ] Implementar InMemoryRepository
    - [ ] Escribir tests
    - [ ] Exportar en lib.rs
 
 5. **API REST** ✓
+
    - [ ] Crear DTOs con ToSchema
    - [ ] Crear handlers con utoipa::path
    - [ ] Agregar rutas al router
@@ -891,6 +932,7 @@ Cuando agregues una nueva funcionalidad completa (entidad + Web + API + CLI):
    - [ ] Probar con curl o Swagger UI
 
 6. **Web UI** ✓
+
    - [ ] Crear templates HTML
    - [ ] Crear structs de templates
    - [ ] Implementar handlers
@@ -899,6 +941,7 @@ Cuando agregues una nueva funcionalidad completa (entidad + Web + API + CLI):
    - [ ] Probar en navegador
 
 7. **CLI** ✓
+
    - [ ] Definir comandos en cli_args.rs
    - [ ] Implementar lógica de comandos
    - [ ] Agregar métodos al ApiClient
@@ -955,6 +998,7 @@ cargo build --release
 ## 🎨 Patrones y Convenciones
 
 ### Nombres de archivos
+
 - `entidad.rs` - Entidades del dominio
 - `entidad_service.rs` - Traits de servicios
 - `entidad_service_impl.rs` - Implementación de servicios
@@ -962,18 +1006,21 @@ cargo build --release
 - `entidad_repository_memory.rs` - Implementación en memoria
 
 ### Nombres de funciones
+
 - **Services**: `crear_`, `listar_`, `obtener_`, `actualizar_`, `eliminar_`
 - **Repositories**: `guardar`, `obtener`, `listar`, `actualizar`, `eliminar`
 - **Handlers Web**: `_page` suffix para páginas, `_submit` para POST
 - **Handlers API**: nombres descriptivos sin suffix
 
 ### Manejo de errores
+
 - Domain: `Result<T, String>` con mensajes descriptivos
 - Services: Propagar errores del domain y repository
 - Handlers: Convertir a StatusCode apropiado
 - CLI: `Result<(), Box<dyn std::error::Error>>`
 
 ### Tests
+
 - Nombrar tests con `test_` prefix
 - Un test por comportamiento
 - Usar nombres descriptivos: `test_crear_empleado_valido`
