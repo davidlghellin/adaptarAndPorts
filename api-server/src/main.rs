@@ -12,26 +12,37 @@
 use reservas_adapters::{InMemoryEmpleadoRepository, InMemoryReservaRepository};
 use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl};
 use std::sync::Arc;
+use tracing::{info, warn};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {
-    println!("🚀 Sistema de Reservas - API REST");
-    println!("📦 Arquitectura Hexagonal (Puertos y Adaptadores)\n");
+    // Inicializar el sistema de logging
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "info,tower_http=debug,axum::rejection=trace".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    info!("🚀 Sistema de Reservas - API REST");
+    info!("📦 Arquitectura Hexagonal (Puertos y Adaptadores)");
 
     // 1. ADAPTADORES DE SALIDA: Repositorios en memoria
-    println!("🔧 Configurando adaptadores de salida (repositorios)...");
+    info!("🔧 Configurando adaptadores de salida (repositorios)");
     let empleado_repo = InMemoryEmpleadoRepository::new();
     let reserva_repo = InMemoryReservaRepository::new();
 
     // 2. SERVICIOS DE APLICACIÓN: Casos de uso
-    println!("⚙️  Configurando servicios de aplicación...");
+    info!("⚙️  Configurando servicios de aplicación");
     let empleado_service = Arc::new(EmpleadoServiceImpl::new(empleado_repo))
         as Arc<dyn reservas_ports::EmpleadoService>;
     let reserva_service = Arc::new(ReservaServiceImpl::new(reserva_repo))
         as Arc<dyn reservas_ports::ReservaService>;
 
     // 3. ADAPTADORES DE ENTRADA: API REST + Web UI
-    println!("🌐 Configurando adaptadores de entrada...");
+    info!("🌐 Configurando adaptadores de entrada");
     let api_router = api_rest::crear_router(
         Arc::clone(&empleado_service),
         Arc::clone(&reserva_service),
@@ -48,29 +59,11 @@ async fn main() {
     let addr = "0.0.0.0:3000";
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 
-    println!("\n✅ Servidor corriendo en http://{}", addr);
-    println!("\n🌐 Interfaz Web:");
-    println!("   http://{}/ - Interfaz web HTML", addr);
-    println!("\n📖 Documentación API:");
-    println!("   Swagger UI: http://{}/api/swagger-ui", addr);
-    println!("   OpenAPI JSON: http://{}/api/api-docs/openapi.json", addr);
-    println!("\n📚 API REST (bajo /api):");
-    println!("   POST   /api/empleados               - Crear empleado");
-    println!("   GET    /api/empleados               - Listar empleados");
-    println!("   GET    /api/empleados/:id           - Obtener empleado");
-    println!("   POST   /api/empleados/:id/activar   - Activar empleado");
-    println!("   POST   /api/empleados/:id/desactivar - Desactivar empleado");
-    println!();
-    println!("   POST   /api/reservas                - Crear reserva");
-    println!("   GET    /api/reservas                - Listar reservas");
-    println!("   GET    /api/reservas/:id            - Obtener reserva");
-    println!("   POST   /api/reservas/:id/confirmar  - Confirmar reserva");
-    println!("   POST   /api/reservas/:id/cancelar   - Cancelar reserva");
-    println!();
-    println!("   GET    /api/empleados/:id/reservas  - Listar reservas de empleado");
-    println!("   GET    /api/disponibilidad?fecha=YYYY-MM-DD - Tabla de disponibilidad");
-    println!();
-    println!("🎯 Presiona Ctrl+C para detener el servidor\n");
+    info!("✅ Servidor corriendo en http://{}", addr);
+    info!("🌐 Interfaz Web: http://{}/", addr);
+    info!("📖 Swagger UI: http://{}/api/swagger-ui", addr);
+    info!("📖 OpenAPI JSON: http://{}/api/api-docs/openapi.json", addr);
+    warn!("🎯 Presiona Ctrl+C para detener el servidor");
 
     axum::serve(listener, app).await.unwrap();
 }
