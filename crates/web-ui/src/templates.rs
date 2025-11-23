@@ -44,3 +44,7 @@ pub struct EmpleadoFormTemplate;
 pub struct ReservasTemplate {
     pub reservas: Vec<ReservaView>,
 }
+
+#[derive(Template)]
+#[template(path = "disponibilidad.html")]
+pub struct DisponibilidadTemplate;

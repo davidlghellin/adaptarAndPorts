@@ -39,6 +39,8 @@ pub fn crear_router_web(
             "/reservas/:id/cancelar",
             post(handlers::cancelar_reserva),
         )
+        // Disponibilidad
+        .route("/disponibilidad", get(handlers::disponibilidad_page))
         // Archivos estáticos (CSS, imágenes, etc.)
         .nest_service("/static", ServeDir::new("crates/web-ui/static"))
         // Inyectar servicios
