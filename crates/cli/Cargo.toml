@@ -26,3 +26,4 @@ colored = "2.0"
 
 # Tablas en terminal
 tabled = "0.16"
+log = "0.4.28"

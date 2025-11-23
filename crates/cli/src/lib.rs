@@ -7,6 +7,7 @@
 pub mod api_client;
 pub mod cli_args;
 pub mod commands;
+mod response;
 
 // Re-exportar tipos principales para facilitar el uso
 pub use api_client::ApiClient;
