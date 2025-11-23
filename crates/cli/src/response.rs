@@ -43,6 +43,20 @@ pub struct TablaDisponibilidadResponse {
     pub disponibilidad: Vec<DisponibilidadEmpleadoResponse>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct CrearSalaRequest {
+    pub nombre: String,
+    pub capacidad: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SalaResponse {
+    pub id: String,
+    pub nombre: String,
+    pub capacidad: u32,
+    pub activa: bool,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct SlotInfo {
     pub inicio: DateTime<Utc>,

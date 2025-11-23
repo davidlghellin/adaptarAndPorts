@@ -3,6 +3,7 @@
 
 use clap::Parser;
 use colored::Colorize;
+use reservas_cli::cli_args::SalaCommands;
 use reservas_cli::{commands, ApiClient, Cli, Commands, EmpleadoCommands, ReservaCommands};
 
 fn main() {
@@ -58,5 +59,15 @@ fn main() {
         Commands::Disponibilidad { fecha } => {
             commands::ver_disponibilidad(&client, fecha);
         }
+
+        Commands::Sala(cmd) => match cmd {
+            SalaCommands::Listar => {
+                commands::listar_salas(&client);
+            }
+
+            SalaCommands::Crear { nombre, capacidad } => {
+                commands::crear_sala(&client, nombre, capacidad);
+            }
+        },
     }
 }

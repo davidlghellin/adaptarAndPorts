@@ -50,8 +50,11 @@ async fn main() {
 
     // 3. ADAPTADORES DE ENTRADA: API REST + Web UI
     info!("🌐 Configurando adaptadores de entrada");
-    let api_router =
-        api_rest::crear_router(Arc::clone(&empleado_service), Arc::clone(&reserva_service),Arc::clone(&sala_service));
+    let api_router = api_rest::crear_router(
+        Arc::clone(&empleado_service),
+        Arc::clone(&reserva_service),
+        Arc::clone(&sala_service),
+    );
     let web_router = web_ui::crear_router_web(
         Arc::clone(&empleado_service),
         Arc::clone(&reserva_service),
