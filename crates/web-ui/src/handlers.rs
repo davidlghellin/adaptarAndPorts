@@ -8,7 +8,7 @@ use axum::{
     Extension,
 };
 use reservas_domain::reserva::EstadoReserva;
-use reservas_ports::{EmpleadoService, ReservaService};
+use reservas_ports::{EmpleadoService, ReservaService, SalaService};
 use serde::Deserialize;
 use std::sync::Arc;
 
@@ -147,4 +147,47 @@ pub async fn cancelar_reserva(
 
 pub async fn disponibilidad_page() -> impl IntoResponse {
     DisponibilidadTemplate
+}
+
+pub async fn listar_salas_page(
+    Extension(service): Extension<Arc<dyn SalaService>>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let salas = service
+        .listar_salas()
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let salas_view: Vec<SalaView> = salas
+        .into_iter()
+        .map(|s| SalaView {
+            id: s.id,
+            nombre: s.nombre,
+            capacidad: s.capacidad,
+            activa: s.activa,
+        })
+        .collect();
+
+    Ok(SalasTemplate { salas: salas_view })
+}
+
+pub async fn activar_sala(
+    Extension(service): Extension<Arc<dyn SalaService>>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, StatusCode> {
+    service
+        .activar_sala(&id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Redirect::to("/salas"))
+}
+
+pub async fn desactivar_sala(
+    Extension(service): Extension<Arc<dyn SalaService>>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, StatusCode> {
+    service
+        .desactivar_sala(&id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Redirect::to("/salas"))
 }
