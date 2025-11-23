@@ -144,3 +144,7 @@ pub async fn cancelar_reserva(
 
     Ok(Redirect::to("/reservas"))
 }
+
+pub async fn disponibilidad_page() -> impl IntoResponse {
+    DisponibilidadTemplate
+}

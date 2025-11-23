@@ -298,3 +298,35 @@ h3 {
     color: #34495e;
     margin-bottom: 1rem;
 }
+
+/* Info message */
+.info-message {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    color: #0c5460;
+}
+
+.info-message strong {
+    font-weight: 600;
+}
+
+.info-message ul {
+    margin-top: 1rem;
+    margin-left: 2rem;
+}
+
+.info-message code {
+    background-color: #b8daff;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.info-message a {
+    color: #004085;
+    text-decoration: underline;
+}
