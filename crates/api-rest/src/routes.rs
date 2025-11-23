@@ -8,6 +8,7 @@ use axum::{
 };
 use reservas_ports::{EmpleadoService, ReservaService};
 use std::sync::Arc;
+use tower_http::trace::TraceLayer;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -50,4 +51,6 @@ pub fn crear_router(
         // Inyectar servicios como extensions (Dependency Injection)
         .layer(Extension(empleado_service))
         .layer(Extension(reserva_service))
+        // Logging de peticiones HTTP
+        .layer(TraceLayer::new_for_http())
 }

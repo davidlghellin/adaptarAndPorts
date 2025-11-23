@@ -22,6 +22,10 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 utoipa = { version = "5.3", features = ["axum_extras", "chrono"] }
 utoipa-swagger-ui = { version = "8.0", features = ["axum"] }
 
+# Logging
+tracing = "0.1"
+tower-http = { version = "0.6", features = ["trace"] }
+
 # Nuestras capas internas
 reservas-domain = { path = "../domain" }
 reservas-ports = { path = "../ports" }
