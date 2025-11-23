@@ -4,6 +4,19 @@ Sistema de gestión de reservas implementado con arquitectura hexagonal (puertos
 
 ## 🚀 Quick Start
 
+### Opción 1: Con Docker (Recomendado)
+
+```bash
+# Iniciar con docker-compose
+docker-compose up
+
+# O construir y ejecutar manualmente
+docker build -t reservas-api .
+docker run -p 3000:3000 reservas-api
+```
+
+### Opción 2: Con Cargo
+
 ```bash
 # Ejecutar el servidor
 cargo run -p api-server
@@ -279,6 +292,41 @@ reserva_service.crear_reserva(...).await?;
 - **Domain-Driven Design**: Eric Evans
 - **Clean Architecture**: Robert C. Martin
 
+## 🐳 Distribución con Docker
+
+El proyecto incluye configuración completa de Docker para facilitar el despliegue:
+
+### Archivos de Docker
+- `Dockerfile` - Multi-stage build para optimizar el tamaño de la imagen
+- `docker-compose.yml` - Configuración simplificada
+- `.dockerignore` - Exclusión de archivos innecesarios
+
+### Comandos Docker
+
+```bash
+# Con docker-compose (más fácil)
+docker-compose up                    # Iniciar
+docker-compose up -d                 # Iniciar en background
+docker-compose logs -f               # Ver logs
+docker-compose down                  # Detener
+
+# Con docker (manual)
+docker build -t reservas-api .       # Construir imagen
+docker run -p 3000:3000 reservas-api # Ejecutar contenedor
+
+# Distribución
+docker save reservas-api > reservas-api.tar     # Exportar imagen
+docker load < reservas-api.tar                  # Importar imagen
+```
+
+### Variables de entorno
+Puedes configurar el nivel de logs:
+```bash
+docker run -p 3000:3000 -e RUST_LOG=debug reservas-api
+```
+
+Niveles disponibles: `error`, `warn`, `info`, `debug`, `trace`
+
 ## 🛠️ Tecnologías
 
 **Core**:
@@ -292,6 +340,7 @@ reserva_service.crear_reserva(...).await?;
 - **Axum** 0.7 - Framework web
 - **Utoipa** - Generación de OpenAPI/Swagger
 - **Serde** - Serialización JSON
+- **Tracing** - Logging estructurado
 
 **Web UI**:
 - **Askama** - Templates HTML (similar a Jinja)
@@ -301,3 +350,7 @@ reserva_service.crear_reserva(...).await?;
 **CLI**:
 - **Clap** - Parser de argumentos
 - **Reqwest** - Cliente HTTP para consumir la API
+
+**Deployment**:
+- **Docker** - Containerización
+- **Docker Compose** - Orquestación
