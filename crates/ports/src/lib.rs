@@ -8,7 +8,7 @@
 // - OUTPUT PORTS: Qué necesita el sistema (repositorios, etc.)
 
 use async_trait::async_trait;
-use reservas_domain::{Empleado, Reserva, Slot};
+use reservas_domain::{Empleado, Reserva, Sala, Slot};
 
 /// Puerto de entrada (INPUT PORT): Define cómo usar el sistema
 /// Este es el "caso de uso" de nuestro sistema
@@ -88,4 +88,21 @@ pub trait EmpleadoRepository {
     async fn actualizar(&self, empleado: &Empleado) -> Result<(), String>;
 
     async fn existe(&self, id: &str) -> Result<bool, String>;
+}
+
+#[async_trait]
+pub trait SalaRepository {
+    async fn guardar(&self, sala: &Sala) -> Result<(), String>;
+    async fn obtener(&self, id: &str) -> Result<Option<Sala>, String>;
+    async fn listar(&self) -> Result<Vec<Sala>, String>;
+    async fn actualizar(&self, sala: &Sala) -> Result<(), String>;
+}
+
+#[async_trait]
+pub trait SalaService: Send + Sync {
+    async fn crear_sala(&self, nombre: String, capacidad: u32) -> Result<Sala, String>;
+    async fn listar_salas(&self) -> Result<Vec<Sala>, String>;
+    async fn obtener_sala(&self, id: &str) -> Result<Option<Sala>, String>;
+    async fn activar_sala(&self, id: &str) -> Result<(), String>;
+    async fn desactivar_sala(&self, id: &str) -> Result<(), String>;
 }
