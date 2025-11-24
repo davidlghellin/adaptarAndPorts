@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use reservas_domain::Sala;
-use reservas_ports::SalaRepository;
+use reservas_ports::out::sala_repository::SalaRepository;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;

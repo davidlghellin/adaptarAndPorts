@@ -8,7 +8,8 @@ use axum::{
     Extension, Json,
 };
 use reservas_domain::Slot;
-use reservas_ports::ReservaService;
+use reservas_ports::r#in::reserva_service::ReservaService;
+
 use std::sync::Arc;
 
 /// Crear una nueva reserva

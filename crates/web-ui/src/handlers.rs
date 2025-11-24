@@ -8,9 +8,12 @@ use axum::{
     Extension,
 };
 use reservas_domain::reserva::EstadoReserva;
-use reservas_ports::{EmpleadoService, ReservaService, SalaService};
+use reservas_ports::r#in::reserva_service::ReservaService;
 use serde::Deserialize;
 use std::sync::Arc;
+
+use reservas_ports::r#in::empleado_service::EmpleadoService;
+use reservas_ports::r#in::sala_service::SalaService;
 
 use crate::templates::*;
 

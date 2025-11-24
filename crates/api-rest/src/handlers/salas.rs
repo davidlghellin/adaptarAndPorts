@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use reservas_ports::SalaService;
+use reservas_ports::r#in::sala_service::SalaService;
 use std::sync::Arc;
 
 /// Listar todas las salas

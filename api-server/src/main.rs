@@ -13,10 +13,13 @@ use reservas_adapters::{
     InMemoryEmpleadoRepository, InMemoryReservaRepository, InMemorySalaRepository,
 };
 use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl, SalaServiceImpl};
-use reservas_ports::{EmpleadoService, ReservaService, SalaService};
+use reservas_ports::r#in::reserva_service::ReservaService;
 use std::sync::Arc;
 use tracing::{info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use reservas_ports::r#in::empleado_service::EmpleadoService;
+use reservas_ports::r#in::sala_service::SalaService;
 
 #[tokio::main]
 async fn main() {
@@ -41,12 +44,11 @@ async fn main() {
     // 2. SERVICIOS DE APLICACIÓN: Casos de uso
     info!("⚙️  Configurando servicios de aplicación");
     let empleado_service: Arc<dyn EmpleadoService> =
-        Arc::new(EmpleadoServiceImpl::new(empleado_repo))
-            as Arc<dyn reservas_ports::EmpleadoService>;
+        Arc::new(EmpleadoServiceImpl::new(empleado_repo)) as Arc<dyn EmpleadoService>;
     let reserva_service: Arc<dyn ReservaService> =
-        Arc::new(ReservaServiceImpl::new(reserva_repo)) as Arc<dyn reservas_ports::ReservaService>;
+        Arc::new(ReservaServiceImpl::new(reserva_repo)) as Arc<dyn ReservaService>;
     let sala_service: Arc<dyn SalaService> =
-        Arc::new(SalaServiceImpl::new(sala_repository)) as Arc<dyn reservas_ports::SalaService>;
+        Arc::new(SalaServiceImpl::new(sala_repository)) as Arc<dyn SalaService>;
 
     // 3. ADAPTADORES DE ENTRADA: API REST + Web UI
     info!("🌐 Configurando adaptadores de entrada");
