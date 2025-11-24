@@ -12,7 +12,7 @@ use reservas_domain::{DisponibilidadService, Slot};
 use reservas_ports::{EmpleadoService, ReservaService};
 
 #[tokio::main]
-async fn main()-> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🎯 Sistema de Reservas de Empleados - Arquitectura Hexagonal\n");
     println!("📦 Nuevo modelo de dominio:");
     println!("   - Empleados con reservas de tiempo");
