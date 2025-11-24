@@ -50,10 +50,20 @@ pub async fn nuevo_empleado_form() -> impl IntoResponse {
     EmpleadoFormTemplate
 }
 
+pub async fn nuevo_sala_form() -> impl IntoResponse {
+    SalaFormTemplate
+}
+
 #[derive(Deserialize)]
 pub struct CrearEmpleadoForm {
     nombre: String,
     email: String,
+}
+
+#[derive(Deserialize)]
+pub struct CrearSalaForm {
+    nombre: String,
+    capacidad: u32,
 }
 
 pub async fn crear_empleado_submit(
@@ -66,6 +76,18 @@ pub async fn crear_empleado_submit(
         .map_err(|_| StatusCode::BAD_REQUEST)?;
 
     Ok(Redirect::to("/empleados"))
+}
+
+pub async fn crear_sala_submit(
+    Extension(service): Extension<Arc<dyn SalaService>>,
+    Form(form): Form<CrearSalaForm>,
+) -> Result<Redirect, StatusCode> {
+    service
+        .crear_sala(form.nombre, form.capacidad)
+        .await
+        .map_err(|_| StatusCode::BAD_REQUEST)?;
+
+    Ok(Redirect::to("/salas"))
 }
 
 pub async fn activar_empleado(
