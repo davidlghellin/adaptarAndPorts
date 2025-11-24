@@ -37,6 +37,8 @@ pub fn crear_router_web(
         .route("/disponibilidad", get(handlers::disponibilidad_page))
         // Salas
         .route("/salas", get(handlers::listar_salas_page))
+        .route("/salas/nuevo", get(handlers::nuevo_sala_form))
+        .route("/salas/crear", post(handlers::crear_sala_submit))
         // .route("/salas/:id/activar", post(handlers::activar_sala))
         // .route("/salas/:id/desactivar", post(handlers::desactivar_sala))
         // Archivos estáticos (CSS, imágenes, etc.)
