@@ -8,7 +8,7 @@ members = [
     "crates/api-rest",
     "crates/cli",
     "crates/web-ui",
-    "reservas-app",
+    "example/reservas-app",
     "api-server",
     "cli-app",
 ]
