@@ -6,7 +6,10 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
-use reservas_ports::{EmpleadoService, ReservaService, SalaService};
+
+use reservas_ports::r#in::empleado_service::EmpleadoService;
+use reservas_ports::r#in::reserva_service::ReservaService;
+use reservas_ports::r#in::sala_service::SalaService;
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 use utoipa::OpenApi;

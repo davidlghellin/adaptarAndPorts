@@ -11,8 +11,10 @@ use axum::{
 };
 use chrono::{Datelike, NaiveDate};
 use reservas_domain::{DisponibilidadService, Slot};
-use reservas_ports::{EmpleadoService, ReservaService};
+use reservas_ports::r#in::empleado_service::EmpleadoService;
+use reservas_ports::r#in::reserva_service::ReservaService;
 use serde::Deserialize;
+
 use std::sync::Arc;
 
 #[derive(Debug, Deserialize, utoipa::IntoParams)]

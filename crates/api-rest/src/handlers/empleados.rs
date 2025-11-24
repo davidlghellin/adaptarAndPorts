@@ -8,7 +8,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use reservas_ports::EmpleadoService;
+use reservas_ports::r#in::empleado_service::EmpleadoService;
 use std::sync::Arc;
 
 /// Crear un nuevo empleado

@@ -11,11 +11,14 @@
 
 use async_trait::async_trait;
 use reservas_domain::{Empleado, Reserva, Sala, Slot};
-use reservas_ports::{
-    EmpleadoRepository, EmpleadoService, ReservaRepository, ReservaService, SalaRepository,
-    SalaService,
-};
+use reservas_ports::r#in::reserva_service::ReservaService;
 use uuid::Uuid;
+
+use reservas_ports::out::empleado_repository::EmpleadoRepository;
+use reservas_ports::out::reserva_repository::ReservaRepository;
+use reservas_ports::out::sala_repository::SalaRepository;
+use reservas_ports::r#in::empleado_service::EmpleadoService;
+use reservas_ports::r#in::sala_service::SalaService;
 
 /// Servicio de aplicación que implementa los casos de uso de reservas
 pub struct ReservaServiceImpl<R: ReservaRepository> {

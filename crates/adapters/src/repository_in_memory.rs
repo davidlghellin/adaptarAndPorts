@@ -3,7 +3,7 @@
 
 use async_trait::async_trait;
 use reservas_domain::{Reserva, Slot};
-use reservas_ports::ReservaRepository;
+use reservas_ports::out::reserva_repository::ReservaRepository;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;

@@ -9,8 +9,9 @@ use chrono::{Datelike, Timelike, Utc};
 use reservas_adapters::{InMemoryEmpleadoRepository, InMemoryReservaRepository};
 use reservas_application::{EmpleadoServiceImpl, ReservaServiceImpl};
 use reservas_domain::{DisponibilidadService, Slot};
-use reservas_ports::{EmpleadoService, ReservaService};
+use reservas_ports::r#in::reserva_service::ReservaService;
 
+use reservas_ports::r#in::empleado_service::EmpleadoService;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🎯 Sistema de Reservas de Empleados - Arquitectura Hexagonal\n");

@@ -2,7 +2,7 @@
 
 use async_trait::async_trait;
 use reservas_domain::Empleado;
-use reservas_ports::EmpleadoRepository;
+use reservas_ports::out::empleado_repository::EmpleadoRepository;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
