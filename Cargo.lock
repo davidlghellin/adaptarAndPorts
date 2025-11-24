@@ -1437,6 +1437,7 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
+ "log",
  "reqwest",
  "serde",
  "serde_json",

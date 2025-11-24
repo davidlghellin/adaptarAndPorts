@@ -9,10 +9,10 @@ path = "src/main.rs"
 
 [dependencies]
 # El binario usa todas las capas
-reservas-domain = { path = "../crates/domain" }
-reservas-ports = { path = "../crates/ports" }
-reservas-application = { path = "../crates/application" }
-reservas-adapters = { path = "../crates/adapters" }
+reservas-domain = { path = "../../crates/domain" }
+reservas-ports = { path = "../../crates/ports" }
+reservas-application = { path = "../../crates/application" }
+reservas-adapters = { path = "../../crates/adapters" }
 
 tokio = { workspace = true }
 chrono = { workspace = true }

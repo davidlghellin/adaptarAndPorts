@@ -35,6 +35,8 @@ pub enum Commands {
         #[arg(short, long)]
         fecha: String,
     },
+    #[command(subcommand)]
+    Sala(SalaCommands),
 }
 
 #[derive(Subcommand)]
@@ -119,4 +121,19 @@ pub enum ReservaCommands {
         #[arg(short, long)]
         id: String,
     },
+}
+
+#[derive(Subcommand)]
+pub enum SalaCommands {
+    /// Listar todas las salas
+    Listar,
+    //  /// Crear nueva sala
+    Crear {
+        nombre: String,
+        capacidad: u32,
+    },
+    // /// Activar sala
+    // Activar { id: String },
+    // /// Desactivar sala
+    // Desactivar { id: String },
 }

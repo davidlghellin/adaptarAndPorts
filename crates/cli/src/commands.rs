@@ -4,7 +4,6 @@ use crate::api_client::ApiClient;
 use chrono::{NaiveDate, NaiveTime, TimeZone, Utc};
 use colored::Colorize;
 use tabled::{Table, Tabled};
-
 // ============= Comandos de Empleados =============
 
 #[derive(Tabled)]
@@ -346,6 +345,72 @@ pub fn ver_disponibilidad(client: &ApiClient, fecha: String) {
                     );
                 }
             }
+        }
+        Err(e) => {
+            println!("{} {}", "✗ Error:".red(), e);
+        }
+    }
+}
+
+// ============= Comandos de Salas =============
+
+#[derive(Tabled)]
+struct SalaRow {
+    #[tabled(rename = "ID")]
+    id: String,
+    #[tabled(rename = "Nombre")]
+    nombre: String,
+    #[tabled(rename = "Capacidad")]
+    capacidad: u32,
+    #[tabled(rename = "Activa")]
+    activa: String,
+}
+
+pub fn listar_salas(client: &ApiClient) {
+    println!("{}", "Obteniendo lista de salas...".cyan());
+
+    match client.listar_salas() {
+        Ok(salas) => {
+            if salas.is_empty() {
+                println!("{}", "No hay salas registradas".yellow());
+                return;
+            }
+
+            let rows: Vec<SalaRow> = salas
+                .into_iter()
+                .map(|s| SalaRow {
+                    id: s.id,
+                    nombre: s.nombre,
+                    capacidad: s.capacidad,
+                    activa: if s.activa {
+                        "Sí".to_string()
+                    } else {
+                        "No".to_string()
+                    },
+                })
+                .collect();
+
+            let count = rows.len();
+            let table = Table::new(rows).to_string();
+            println!("\n{}", table);
+            println!("\n{} sala(s) encontrada(s)", count);
+        }
+        Err(e) => {
+            println!("{} {}", "✗ Error:".red(), e);
+        }
+    }
+}
+
+pub fn crear_sala(client: &ApiClient, nombre: String, capacidad: u32) {
+    println!("{}", "Creando sala...".cyan());
+
+    match client.crear_sala(nombre, capacidad) {
+        Ok(sala) => {
+            println!("{}", "✓ Sala creada exitosamente".green());
+            println!("  ID: {}", sala.id);
+            println!("  Nombre: {}", sala.nombre);
+            println!("  Capacidad: {}", sala.capacidad);
+            println!("  Activa: {}", if sala.activa { "Sí" } else { "No" });
         }
         Err(e) => {
             println!("{} {}", "✗ Error:".red(), e);
